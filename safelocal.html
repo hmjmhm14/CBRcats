@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>CBRcats — Система Данных</title>
+</head>
+<body>
+    <script>
+        /**
+         * CBRcats ENGINE v1.0 — Система локального хранения и ID
+         */
+
+        const CONFIG = {
+            storageKey: 'cbrcat_user_data',
+            counterKey: 'cbrcat_id_counter',
+            defaultAvatar: 'https://i.ibb.co/V09zmWcT/image.png'
+        };
+
+        /**
+         * Преобразует число в формат 00.00
+         * 0 -> 00.00
+         * 1 -> 00.01
+         * 100 -> 01.00
+         */
+        function formatPlayerID(num) {
+            let main = Math.floor(num / 100).toString().padStart(2, '0');
+            let sub = (num % 100).toString().padStart(2, '0');
+            return `${main}.${sub}`;
+        }
+
+        /**
+         * Инициализация данных (Регистрация)
+         */
+        function initCBRSystem() {
+            let userData = localStorage.getItem(CONFIG.storageKey);
+            let idCounter = localStorage.getItem(CONFIG.counterKey);
+
+            // Если счетчик еще не создан (самый первый запуск разработчиком)
+            if (idCounter === null) {
+                localStorage.setItem(CONFIG.counterKey, "0");
+                idCounter = "0";
+            }
+
+            // Если профиля нет — создаем его (Регистрация)
+            if (!userData) {
+                let currentCount = parseInt(idCounter);
+                let newID = formatPlayerID(currentCount);
+                
+                // Данные нового кота
+                const newProfile = {
+                    id: newID,
+                    name: currentCount === 0 ? "Разработчик" : "Новый Кот",
+                    appearance: CONFIG.defaultAvatar,
+                    tribe: "Одиночки",
+                    gender: "кот",
+                    birthday: new Date().toLocaleDateString(),
+                    about: "История выживания в мире зомби...",
+                    status: currentCount === 0 ? "admin" : "player"
+                };
+
+                // Сохраняем профиль
+                localStorage.setItem(CONFIG.storageKey, JSON.stringify(newProfile));
+
+                // Увеличиваем счетчик для следующего человека
+                localStorage.setItem(CONFIG.counterKey, (currentCount + 1).toString());
+
+                console.log("CBRcats: Профиль создан! Ваш ID: " + newID);
+            }
+        }
+
+        /**
+         * Функция обновления данных (например, когда выбрал новый окрас)
+         */
+        function updateCBRData(field, value) {
+            let data = JSON.parse(localStorage.getItem(CONFIG.storageKey));
+            if (data) {
+                data[field] = value;
+                localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
+            }
+        }
+
+        /**
+         * Функция получения данных для отображения
+         */
+        function getCBRData() {
+            return JSON.parse(localStorage.getItem(CONFIG.storageKey));
+        }
+
+        // Запуск при загрузке
+        initCBRSystem();
+    </script>
+</body>
+</html>
