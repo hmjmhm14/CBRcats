@@ -7,68 +7,196 @@
     <style>
         * { box-sizing: border-box; }
         body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background: #050505; color: #d1d1d1;
-            font-family: 'Arial', sans-serif; overflow: hidden;
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background: #050505;
+            color: #d1d1d1;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
         }
+
         .profile-wrapper {
-            width: 95vw; height: 90vh; margin: 2vh auto;
-            background: #000; border: 2px solid #ffcc00;
-            border-radius: 12px; display: flex; flex-direction: column;
-            padding: 20px; box-shadow: 0 0 30px rgba(255, 204, 0, 0.1);
+            width: 95vw;
+            height: 90vh;
+            margin: 2vh auto;
+            background: #000;
+            border: 2px solid #ffcc00;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.1);
         }
+
         .profile-header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #222; padding-bottom: 15px; margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
         }
-        .profile-header h1 { margin: 0; color: #ffcc00; font-size: 1.8em; text-transform: uppercase; letter-spacing: 2px; }
+
+        .profile-header h1 {
+            margin: 0;
+            color: #ffcc00;
+            font-size: 1.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
         .exit-btn {
-            padding: 8px 20px; background: transparent; border: 1px solid #ff3333;
-            color: #ff3333; cursor: pointer; border-radius: 4px; transition: 0.3s;
+            padding: 8px 20px;
+            background: transparent;
+            border: 1px solid #ff3333;
+            color: #ff3333;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.3s;
         }
         .exit-btn:hover { background: #ff3333; color: #fff; }
-        .main-content { display: flex; flex: 1; gap: 30px; min-height: 0; }
-        .left-col { flex: 0 0 300px; display: flex; flex-direction: column; gap: 15px; }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            gap: 30px;
+            min-height: 0;
+        }
+
+        .left-col {
+            flex: 0 0 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
         .avatar-box {
-            width: 300px; height: 350px; background: #0a0a0a;
-            border: 1px solid #333; display: flex; justify-content: center;
-            align-items: center; position: relative; overflow: hidden;
+            width: 300px;
+            height: 350px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
         }
-        #profile-img { max-width: 100%; max-height: 100%; display: none; }
-        .no-skin-text { color: #222; font-size: 0.8em; position: absolute; }
+
+        #profile-img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+
+        .no-skin-text {
+            color: #222;
+            font-size: 0.8em;
+            text-align: center;
+        }
+
         .select-btn {
-            width: 100%; padding: 12px; background: #4caf50;
-            color: #000; border: none; font-weight: bold;
-            cursor: pointer; border-radius: 4px; text-decoration: none; text-align: center;
+            width: 100%;
+            padding: 12px;
+            background: #4caf50;
+            color: #000;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            text-decoration: none;
+            text-align: center;
+            transition: 0.3s;
         }
-        .menu-btns { display: flex; flex-direction: column; gap: 8px; }
+        .select-btn:hover { background: #66bb6a; }
+
+        .menu-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
         .menu-btn {
-            background: #111; color: #888; border: 1px solid #222;
-            padding: 10px; text-align: center; text-decoration: none;
-            font-size: 0.9em; transition: 0.2s;
+            background: #111;
+            color: #888;
+            border: 1px solid #222;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: 0.2s;
         }
-        .menu-btn:hover { border-color: #ffcc00; color: #ffcc00; }
-        .right-col { flex: 1; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; padding-right: 10px; }
-        .info-grid { display: flex; flex-direction: column; gap: 10px; }
+        
+        /* Стиль для заблокированных кнопок */
+        .menu-btn.locked {
+            opacity: 0.2;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .menu-btn:not(.locked):hover {
+            border-color: #ffcc00;
+            color: #ffcc00;
+        }
+
+        .right-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         .info-row {
-            display: flex; justify-content: space-between; padding: 12px 15px;
-            background: #080808; border-left: 3px solid #ffcc00; border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: #080808;
+            border-left: 3px solid #ffcc00;
+            border-radius: 4px;
         }
+
         .info-label { color: #666; font-size: 0.9em; }
         .info-value { color: #eee; font-weight: bold; }
-        .about-box { flex: 1; background: #080808; border: 1px solid #222; padding: 15px; border-radius: 4px; margin-top: 10px; }
-        .about-box h3 { margin: 0 0 10px; font-size: 0.8em; color: #ffcc00; text-transform: uppercase; }
-        .about-text { color: #888; font-size: 0.95em; line-height: 1.5; font-style: italic; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #333; }
+
+        .about-box {
+            flex: 1;
+            background: #080808;
+            border: 1px solid #222;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .about-box h3 {
+            margin: 0 0 10px;
+            font-size: 0.8em;
+            color: #ffcc00;
+            text-transform: uppercase;
+        }
+
+        .about-text {
+            color: #888;
+            font-size: 0.95em;
+            line-height: 1.5;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
+
     <div class="profile-wrapper">
         <header class="profile-header">
-            <h1>ЧАСТОКОЛ</h1>
-            <button class="exit-btn" onclick="location.href='../основное/index.html'">ВЫЙТИ</button>
+            <h1 id="header-name">ЗАГРУЗКА...</h1>
+            <button class="exit-btn" onclick="logout()">ВЫЙТИ</button>
         </header>
+
         <div class="main-content">
             <div class="left-col">
                 <div class="avatar-box" id="cat-box">
@@ -76,24 +204,40 @@
                     <img id="profile-img" src="" alt="Кот">
                 </div>
                 <a href="okras.html" class="select-btn">ВЫБРАТЬ ОКРАС</a>
+                
                 <div class="menu-btns">
-                    <a href="../игровая/game.html" class="menu-btn">ИГРОВАЯ</a>
-                    <a href="#" class="menu-btn">ГРУППЫ / ЧАТЫ</a>
-                    <a href="#" class="menu-btn">ЛИЧНЫЕ СООБЩЕНИЯ</a>
-                    <a href="#" class="menu-btn">НОВОСТИ</a>
+                    <a href="../игровая/game.html" class="menu-btn game-link">ИГРОВАЯ</a>
+                    <a href="#" class="menu-btn locked">ГРУППЫ / ЧАТЫ</a>
+                    <a href="#" class="menu-btn locked">ЛИЧНЫЕ СООБЩЕНИЯ</a>
+                    <a href="#" class="menu-btn locked">НОВОСТИ</a>
                 </div>
             </div>
+
             <div class="right-col">
                 <div class="info-grid">
-                    <div class="info-row"><span class="info-label">ID Персонажа</span><span class="info-value">#54219</span></div>
-                    <div class="info-row"><span class="info-label">Имя</span><span class="info-value">Частокол</span></div>
-                    <div class="info-row"><span class="info-label">Племя / Клан</span><span class="info-value">Одиночки</span></div>
-                    <div class="info-row"><span class="info-label">Пол</span><span class="info-value">кот</span></div>
-                    <div class="info-row"><span class="info-label">День рождения</span><span class="info-value">23.03.2026</span></div>
+                    <div class="info-row">
+                        <span class="info-label">ID Персонажа</span>
+                        <span class="info-value" id="display-id">--.--</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Имя</span>
+                        <span class="info-value" id="display-name">--</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Племя / Клан</span>
+                        <span class="info-value" id="display-tribe">--</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Пол</span>
+                        <span class="info-value" id="display-gender">--</span>
+                    </div>
                 </div>
+
                 <div class="about-box">
                     <h3>О СЕБЕ</h3>
-                    <div class="about-text">Здесь будет твоя история выживания в мире CBRcats...</div>
+                    <div class="about-text" id="display-about">
+                        Загрузка истории...
+                    </div>
                 </div>
             </div>
         </div>
@@ -101,15 +245,49 @@
 
     <script>
         window.onload = function() {
-            const savedImg = localStorage.getItem('cbrcat_appearance');
-            if (savedImg) {
-                const img = document.getElementById('profile-img');
-                const text = document.getElementById('no-skin');
-                img.src = savedImg;
+            // Берем данные из единого хранилища, созданного в safelocal
+            const userData = JSON.parse(localStorage.getItem('cbrcat_user_data'));
+
+            if (!userData) {
+                // Если зашли в профиль без регистрации - выкидываем на главную
+                window.location.href = '../index.html';
+                return;
+            }
+
+            // 1. Заполняем текстовые поля
+            document.getElementById('header-name').textContent = userData.name.toUpperCase();
+            document.getElementById('display-id').textContent = userData.id;
+            document.getElementById('display-name').textContent = userData.name;
+            document.getElementById('display-tribe').textContent = userData.tribe;
+            document.getElementById('display-gender').textContent = userData.gender;
+            document.getElementById('display-about').textContent = userData.about;
+
+            // 2. Отображаем кота, если он выбран
+            const img = document.getElementById('profile-img');
+            const noSkin = document.getElementById('no-skin');
+            
+            if (userData.appearance && userData.appearance !== "") {
+                img.src = userData.appearance;
                 img.style.display = 'block';
-                text.style.display = 'none'; // Скрываем надпись, если есть окрас
+                noSkin.style.display = 'none';
+            }
+
+            // 3. ПРОВЕРКА ГОТОВНОСТИ (isReady)
+            // Если окрас не выбран, блокируем вход в игровую
+            const gameLink = document.querySelector('.game-link');
+            if (!userData.isReady) {
+                gameLink.classList.add('locked');
+                gameLink.onclick = function(e) {
+                    e.preventDefault();
+                    alert("Сначала выберите окрас персонажа!");
+                };
             }
         };
+
+        function logout() {
+            // Просто уходим на главную (данные в localStorage остаются)
+            window.location.href = '../index.html';
+        }
     </script>
 </body>
 </html>
