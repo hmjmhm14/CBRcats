@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>CBRcats — Выбор окраса</title>
+    <style>
+        body {
+            margin: 0; background: #050505; color: #e0e0e0;
+            font-family: 'Arial', sans-serif; display: flex;
+            justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+        }
+        .configurator {
+            width: 900px; height: 600px; background: #000;
+            border: 2px solid #ffcc00; border-radius: 15px;
+            display: flex; padding: 20px; gap: 20px;
+        }
+        .preview-pane {
+            flex: 1; background: #0a0a0a; border: 1px solid #222;
+            border-radius: 10px; display: flex; justify-content: center;
+            align-items: center; position: relative;
+        }
+        #cat-image { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .options-pane { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+        h2 { color: #ffcc00; font-size: 1.2em; text-transform: uppercase; margin: 0; }
+        .option-group { background: #080808; padding: 10px; border-radius: 5px; border: 1px solid #1a1a1a; }
+        label { display: block; font-size: 0.8em; color: #666; margin-bottom: 8px; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .choice-btn {
+            background: #111; border: 1px solid #333; color: #ccc;
+            padding: 10px; cursor: pointer; font-size: 0.9em; transition: 0.2s;
+        }
+        .choice-btn:hover, .choice-btn.active { border-color: #ffcc00; color: #ffcc00; background: #1a1500; }
+        .save-btn {
+            margin-top: auto; background: #ffcc00; color: #000;
+            border: none; padding: 15px; font-weight: bold;
+            cursor: pointer; border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="configurator">
+    <div class="preview-pane">
+        <img id="cat-image" src="https://i.ibb.co/V09zmWcT/image.png" alt="Ваш кот">
+    </div>
+
+    <div class="options-pane">
+        <h2>Создание выжившего</h2>
+        <div class="option-group">
+            <label>ТИП ШЕРСТИ</label>
+            <div class="btn-grid">
+                <button class="choice-btn active" onclick="setType('short', this)">Короткая</button>
+                <button class="choice-btn" onclick="setType('fluffy', this)">Пушистая</button>
+            </div>
+        </div>
+        <div class="option-group">
+            <label>ОСНОВНОЙ ЦВЕТ</label>
+            <div class="btn-grid">
+                <button class="choice-btn active" onclick="setColor('white', this)">Белый</button>
+                <button class="choice-btn" onclick="setColor('black', this)">Черный</button>
+            </div>
+        </div>
+        <div class="option-group">
+            <label>ЦВЕТ ГЛАЗ</label>
+            <div class="btn-grid">
+                <button class="choice-btn active" onclick="setEyes('red', this)">Красные</button>
+                <button class="choice-btn" onclick="setEyes('orange', this)">Оранжевые</button>
+                <button class="choice-btn" onclick="setEyes('blue', this)">Синие</button>
+                <button class="choice-btn" onclick="setEyes('green', this)">Зеленые</button>
+            </div>
+        </div>
+        <button class="save-btn" onclick="saveAndExit()">ПОДТВЕРДИТЬ ВЫБОР</button>
+    </div>
+</div>
+
+<script>
+    const catData = {
+        short: {
+            white: {
+                red: "https://i.ibb.co/V09zmWcT/image.png",
+                orange: "https://i.ibb.co/wrBZ7530/image.png",
+                blue: "https://i.ibb.co/27wSp4nK/image.png",
+                green: "https://i.ibb.co/1fbFjSXw/image.png"
+            },
+            black: {
+                red: "https://i.ibb.co/KprmPTqM/image.png",
+                orange: "https://i.ibb.co/dsstZH6Y/image.png",
+                blue: "https://i.ibb.co/spsVLKqt/image.png",
+                green: "https://i.ibb.co/BHsRxdCy/image.png"
+            }
+        },
+        fluffy: {
+            white: {
+                red: "https://i.ibb.co/QzhWJGF/image.png",
+                orange: "https://i.ibb.co/mCgFtjCJ/image.png",
+                blue: "https://i.ibb.co/FbdhnYDC/image.png",
+                green: "https://i.ibb.co/999dhMfx/image.png"
+            },
+            black: {
+                red: "https://i.ibb.co/5gtDwrtG/image.png",
+                orange: "https://i.ibb.co/sdffQZPh/image.png",
+                blue: "https://i.ibb.co/qFrnVNn5/image.png",
+                green: "https://i.ibb.co/pBXNd240/image.png"
+            }
+        }
+    };
+
+    let currentType = 'short', currentColor = 'white', currentEyes = 'red';
+
+    function updatePreview() {
+        document.getElementById('cat-image').src = catData[currentType][currentColor][currentEyes];
+    }
+    function setType(v, b) { currentType = v; setActive(b); updatePreview(); }
+    function setColor(v, b) { currentColor = v; setActive(b); updatePreview(); }
+    function setEyes(v, b) { currentEyes = v; setActive(b); updatePreview(); }
+    function setActive(button) {
+        button.parentElement.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('active'));
+        button.classList.add('active');
+    }
+
+    function saveAndExit() {
+        const finalImg = catData[currentType][currentColor][currentEyes];
+        localStorage.setItem('cbrcat_appearance', finalImg); // Сохраняем ссылку
+        window.location.href = 'profile.html'; // Уходим в профиль
+    }
+</script>
+</body>
+</html>
