@@ -34,8 +34,9 @@
         .save-btn {
             margin-top: auto; background: #ffcc00; color: #000;
             border: none; padding: 15px; font-weight: bold;
-            cursor: pointer; border-radius: 5px;
+            cursor: pointer; border-radius: 5px; transition: 0.3s;
         }
+        .save-btn:hover { background: #ffe066; transform: scale(1.02); }
     </style>
 </head>
 <body>
@@ -70,7 +71,7 @@
                 <button class="choice-btn" onclick="setEyes('green', this)">Зеленые</button>
             </div>
         </div>
-        <button class="save-btn" onclick="saveAndExit()">ПОДТВЕРДИТЬ ВЫБОР</button>
+        <button class="save-btn" onclick="saveAndGoToProfile()">ПОДТВЕРДИТЬ И ВЕРНУТЬСЯ</button>
     </div>
 </div>
 
@@ -119,10 +120,26 @@
         button.classList.add('active');
     }
 
-    function saveAndExit() {
+    // ГЛАВНАЯ ФУНКЦИЯ ПЕРЕХОДА
+    function saveAndGoToProfile() {
         const finalImg = catData[currentType][currentColor][currentEyes];
-        localStorage.setItem('cbrcat_appearance', finalImg); // Сохраняем ссылку
-        window.location.href = 'profile.html'; // Уходим в профиль
+        
+        // Получаем объект данных пользователя из памяти
+        let userData = JSON.parse(localStorage.getItem('cbrcat_user_data'));
+        
+        if (userData) {
+            userData.appearance = finalImg; // Сохраняем ссылку на картинку
+            userData.isReady = true;        // Разблокируем доступ к игре
+            
+            // Сохраняем обновленный объект обратно
+            localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
+            
+            // Мгновенный переход в профиль
+            window.location.href = 'profile.html';
+        } else {
+            alert("Ошибка: Профиль не найден. Пожалуйста, зарегистрируйтесь снова.");
+            window.location.href = '../регистрация/reg.html';
+        }
     }
 </script>
 </body>
