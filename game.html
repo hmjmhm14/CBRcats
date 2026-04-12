@@ -4,123 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CBRcats — Игровая</title>
+    
+    <script>
+        const userData = JSON.parse(localStorage.getItem('cbrcat_user_data'));
+        // Если нет данных или окрас не выбран — доступ закрыт
+        if (!userData || !userData.isReady) {
+            alert("Доступ запрещен! Сначала создайте персонажа в профиле.");
+            window.location.href = '../Профиль/profile.html';
+        }
+    </script>
+
     <style>
-        /* Обнуляем отступы, чтобы ничего не выходило за грани */
         * { box-sizing: border-box; }
-        
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden; /* Запрещаем скролл самого сайта */
-            background: #050505;
-            color: #e0e0e0;
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: #050505; color: #e0e0e0;
             font-family: 'Arial', sans-serif;
         }
 
-        /* Главный контейнер на весь экран */
         .app-container {
             display: flex;
-            width: 100vw;
-            height: 100vh;
-            padding: 10px;
-            gap: 10px;
+            width: 100vw; height: 100vh;
+            padding: 10px; gap: 10px;
         }
 
-        /* Боковые панели */
         .side-panel {
-            flex: 0 0 250px; /* Фиксированная ширина боков */
-            background: #000000;
-            border: 2px solid #ffcc00;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            height: 100%;
-            overflow-y: auto; /* Скролл только внутри панели, если контента много */
-        }
-
-        /* Центральное игровое поле */
-        .game-viewport {
-            flex: 1; /* Занимает всё свободное место */
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            flex: 0 0 250px;
             background: #000;
-            border: 1px solid #222;
-            overflow: hidden; /* Чтобы фон не вылезал */
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex; flex-direction: column;
         }
 
-        /* Само поле 1000x1000 (масштабируется под экран, но сохраняет пропорции) */
-        #game-canvas {
-            width: 1000px;
-            height: 1000px;
-            background: #1a1a1a;
+        /* Окно персонажа в игре */
+        .game-avatar-box {
+            width: 100%; height: 200px;
+            background: #0a0a0a; border: 1px solid #222;
+            margin-bottom: 15px; display: flex;
+            justify-content: center; align-items: center;
+        }
+        #game-cat-img { max-width: 100%; max-height: 100%; }
+
+        .game-viewport {
+            flex: 1;
+            background: #000;
+            border: 2px solid #333;
+            border-radius: 10px;
             position: relative;
-            /* Масштабирование, чтобы влезло в экран на телефоне */
-            max-width: 100%;
-            max-height: 100%;
-            aspect-ratio: 1 / 1;
-            box-shadow: 0 0 20px rgba(255, 204, 0, 0.1);
+            overflow: hidden; /* Здесь будет карта 1000x1000 */
         }
 
-        /* Заголовки */
-        h3 {
-            color: #ffcc00;
-            font-size: 0.9em;
-            text-align: center;
-            margin: 0 0 10px;
-            text-transform: uppercase;
-            border-bottom: 1px solid #222;
-            padding-bottom: 5px;
+        #game-canvas {
+            width: 1000px; height: 1000px;
+            background-image: 
+                linear-gradient(#111 1px, transparent 1px),
+                linear-gradient(90deg, #111 1px, transparent 1px);
+            background-size: 50px 50px;
+            position: absolute;
         }
 
-        /* Стили для чата и статов */
-        .chat-block { flex: 2; background: #080808; margin-bottom: 10px; padding: 5px; font-size: 0.8em; border: 1px solid #111; }
-        .stats-block { flex: 1; margin-bottom: 10px; }
-        .skill-block { flex: 1; }
+        h3 { color: #ffcc00; font-size: 0.9em; text-transform: uppercase; margin: 10px 0; }
 
-        .bar { width: 100%; height: 8px; background: #222; margin: 4px 0; border-radius: 4px; }
-        .progress { height: 100%; border-radius: 4px; }
+        .bar { width: 100%; height: 10px; background: #222; border-radius: 5px; margin: 5px 0 15px; overflow: hidden; }
+        .progress { height: 100%; transition: 0.3s; }
 
-        /* Кнопки действий */
         .action-btn {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 5px;
-            background: #111;
-            color: #aaa;
-            border: 1px solid #333;
-            cursor: pointer;
-            font-weight: bold;
+            background: #111; color: #ccc; border: 1px solid #333;
+            padding: 10px; margin-bottom: 5px; cursor: pointer;
+            text-align: left; transition: 0.2s;
         }
-        .action-btn:hover { background: #ffcc00; color: #000; }
-
-        /* Адаптация под маленькие экраны (телефоны) */
-        @media (max-width: 900px) {
-            .app-container { flex-direction: column; overflow-y: auto; }
-            .side-panel { flex: none; width: 100%; height: auto; }
-            #game-canvas { width: 95vw; height: 95vw; }
-        }
+        .action-btn:hover { border-color: #ffcc00; color: #ffcc00; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         <aside class="side-panel">
-            <h3>Чат</h3>
-            <div class="chat-block" id="gameChat"></div>
-            
-            <h3>Параметры</h3>
-            <div class="stats-block">
-                Здоровье <div class="bar"><div class="progress" style="width: 100%; background: #f00;"></div></div>
-                Сытость <div class="bar"><div class="progress" style="width: 70%; background: #0f0;"></div></div>
+            <div class="game-avatar-box">
+                <img id="game-cat-img" src="" alt="Ваш персонаж">
             </div>
+            
+            <h3 id="game-cat-name">ЗАГРУЗКА...</h3>
+            <div style="font-size: 0.8em; color: #666; margin-bottom: 10px;">ID: <span id="game-cat-id">00.00</span></div>
 
-            <h3>Навыки</h3>
-            <div class="skill-block">
-                Охота: 5% <br> Выживание: 10%
+            <div class="stats">
+                Здоровье <div class="bar"><div class="progress" style="width: 100%; background: #f33;"></div></div>
+                Энергия <div class="bar"><div class="progress" style="width: 80%; background: #ffcc00;"></div></div>
+                Сытость <div class="bar"><div class="progress" style="width: 60%; background: #4caf50;"></div></div>
             </div>
         </aside>
 
@@ -132,27 +105,30 @@
         <aside class="side-panel">
             <h3>Действия</h3>
             <button class="action-btn">Осмотреться</button>
-            <button class="action-btn">Охота</button>
-            <button class="action-btn">Сон</button>
-            <button class="action-btn" style="margin-top: auto; color: #f00;">Выход</button>
+            <button class="action-btn">Искать еду</button>
+            <button class="action-btn">Подать голос</button>
+            
+            <button class="action-btn" onclick="location.href='../Профиль/profile.html'" style="margin-top: auto; color: #ff3333; border-color: #400;">ВЕРНУТЬСЯ В ПРОФИЛЬ</button>
         </aside>
     </div>
 
     <script>
-        // Логика ограничения движения внутри 1000x1000
-        const canvasSize = 1000;
-        let catPos = { x: 500, y: 500 }; // Кот в центре
-
-        function moveCat(newX, newY) {
-            // ПРОВЕРКА: Если новые координаты выходят за 0 или 1000 — отменяем
-            if (newX >= 0 && newX <= canvasSize && newY >= 0 && newY <= canvasSize) {
-                catPos.x = newX;
-                catPos.y = newY;
-                console.log("Кот переместился в:", catPos);
-            } else {
-                console.log("Граница достигнута! Дальше нельзя.");
+        // Загружаем данные персонажа в интерфейс игры
+        window.onload = function() {
+            const data = JSON.parse(localStorage.getItem('cbrcat_user_data'));
+            if (data) {
+                document.getElementById('game-cat-img').src = data.appearance;
+                document.getElementById('game-cat-name').textContent = data.name.toUpperCase();
+                document.getElementById('game-cat-id').textContent = data.id;
             }
-        }
+        };
+
+        // Базовая логика камеры (центрирование на персонаже)
+        const canvas = document.getElementById('game-canvas');
+        let posX = 500;
+        let posY = 500;
+
+        // В будущем здесь будет код движения персонажа по сетке
     </script>
 </body>
 </html>
