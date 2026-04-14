@@ -4,47 +4,38 @@
     <meta charset="UTF-8">
     <title>CBRcats — Система Данных</title>
     <style>
-        /* Добавил немного стилей для кнопки очистки */
-        .debug-panel {
-            margin: 20px;
-            padding: 15px;
-            border: 1px dashed #ff3333;
-            background: #1a0000;
-            color: #ff3333;
-            font-family: monospace;
-        }
-        .clear-btn {
-            background: #ff3333;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+        .admin-panel { padding: 20px; background: #1a0000; border: 2px solid #ff0000; color: #fff; font-family: monospace; }
+        .reset-btn { background: #ff0000; color: white; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="debug-panel">
-        <h3>ПАНЕЛЬ УПРАВЛЕНИЯ БАЗОЙ</h3>
-        <p>Внимание: нажатие кнопки удалит ВСЕ аккаунты и сбросит счетчик ID.</p>
-        <button class="clear-btn" onclick="fullSystemReset()">ОЧИСТИТЬ ВСЕ АККАУНТЫ</button>
+    <div class="admin-panel">
+        <h2>СИСТЕМНАЯ ПАНЕЛЬ СБРОСА</h2>
+        <p>Нажми кнопку ниже, чтобы удалить все аккаунты и начать отсчет с 00.00</p>
+        <button class="reset-btn" onclick="fullSystemReset()">СБРОСИТЬ ВСЮ БАЗУ (В 00.00)</button>
     </div>
 
     <script>
-        /**
-         * CBRcats ENGINE v1.2 — Исправленная система ID и локаций
-         */
-
         const CONFIG = {
             storageKey: 'cbrcat_user_data',
             counterKey: 'cbrcat_id_counter',
             defaultAvatar: 'https://i.ibb.co/V09zmWcT/image.png'
         };
 
+        // Твоя логика ID: корректно делит на 100 для перехода 00.99 -> 01.00
         function formatPlayerID(num) {
             let main = Math.floor(num / 100).toString().padStart(2, '0');
             let sub = (num % 100).toString().padStart(2, '0');
             return `${main}.${sub}`;
+        }
+
+        // Функция ПОЛНОГО удаления старых данных
+        function fullSystemReset() {
+            if (confirm("ВНИМАНИЕ: Это удалит твой профиль и сбросит счетчик регистраций. Продолжить?")) {
+                localStorage.clear(); // Полная очистка LocalStorage
+                alert("База очищена! Теперь при регистрации ты получишь ID 00.00.");
+                location.reload();
+            }
         }
 
         function initCBRSystem() {
@@ -66,7 +57,7 @@
                     appearance: CONFIG.defaultAvatar,
                     tribe: "Одиночки",
                     gender: "кот",
-                    spawnLocID: "loc_main", // Спавн по ID локации
+                    spawnLocID: "loc_main",
                     birthday: new Date().toLocaleDateString(),
                     about: "История выживания...",
                     status: currentCount === 0 ? "admin" : "player"
@@ -74,35 +65,7 @@
 
                 localStorage.setItem(CONFIG.storageKey, JSON.stringify(newProfile));
                 localStorage.setItem(CONFIG.counterKey, (currentCount + 1).toString());
-                console.log("CBRcats: Профиль инициализирован. ID: " + newID);
-            }
-        }
-
-        /**
-         * НОВАЯ ФУНКЦИЯ: Полный сброс системы
-         */
-        function fullSystemReset() {
-            if (confirm("ВЫ УВЕРЕНЫ? Все аккаунты будут безвозвратно удалены, а счетчик ID сбросится до 00.00.")) {
-                localStorage.removeItem(CONFIG.storageKey);
-                localStorage.removeItem(CONFIG.counterKey);
-                alert("База данных успешно очищена. Страница будет перезагружена.");
-                location.reload();
-            }
-        }
-
-        function updateCBRData(field, value) {
-            let data = JSON.parse(localStorage.getItem(CONFIG.storageKey));
-            if (data) {
-                data[field] = value;
-                localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
-            }
-        }
-
-        function adminDeletePlayerByID(targetID) {
-            if (targetID === "00.00") return alert("Нельзя удалить создателя!");
-            if (confirm("Удалить данные игрока " + targetID + "?")) {
-                localStorage.removeItem(CONFIG.storageKey);
-                location.reload();
+                console.log("CBRcats: Создан профиль. Ваш ID: " + newID);
             }
         }
 
