@@ -3,141 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CBRcats — Вход в мир</title>
+    <title>CBRcats — Выживание</title>
     <style>
         body {
             margin: 0; padding: 0;
-            background: #0a0a0a; color: #d1d1d1;
-            font-family: 'Arial', sans-serif;
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh;
+            background: #050505; color: #d1d1d1;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex; flex-direction: column;
+            min-height: 100vh;
         }
 
-        .auth-container {
-            width: 350px; background: #000;
-            border: 2px solid #ffcc00; border-radius: 12px;
-            padding: 30px; box-shadow: 0 0 20px rgba(255, 204, 0, 0.1);
+        /* Кроваво-красный хедер с полоской */
+        header {
+            width: 100%;
+            background: linear-gradient(to bottom, #1a0000, #050505);
+            border-bottom: 3px solid #ff0000;
+            padding: 40px 0;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.2);
+        }
+
+        .header-logo {
+            max-width: 500px;
+            width: 90%;
+            filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.5));
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            gap: 50px;
+            flex-wrap: wrap;
+        }
+
+        /* Блок "Об игре" — восстановлен */
+        .info-box {
+            max-width: 400px;
+            background: rgba(20, 20, 20, 0.8);
+            border-left: 4px solid #ff0000;
+            padding: 25px;
+            border-radius: 4px;
+        }
+
+        .info-box h2 {
+            color: #ff0000;
+            margin-top: 0;
+            font-size: 1.5em;
+            text-transform: uppercase;
+        }
+
+        .beta-badge {
+            background: #ff0000;
+            color: #fff;
+            padding: 2px 8px;
+            font-size: 0.6em;
+            vertical-align: middle;
+            border-radius: 3px;
+        }
+
+        /* Контейнер авторизации в красном стиле */
+        .auth-card {
+            width: 380px;
+            background: #000;
+            border: 1px solid #333;
+            padding: 30px;
+            position: relative;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #222;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            color: #555;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .tab.active {
+            color: #ffcc00;
+            border-bottom: 2px solid #ffcc00;
+        }
+
+        .input-field {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75em;
+            color: #888;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: #111;
+            border: 1px solid #222;
+            color: #fff;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #ff0000;
+        }
+
+        .universe-static {
+            padding: 12px;
+            background: #0a0a0a;
+            border: 1px dashed #444;
+            color: #ffcc00;
+            font-size: 0.9em;
             text-align: center;
         }
 
-        header img { max-width: 200px; margin-bottom: 20px; }
-        h2 { color: #ffcc00; font-size: 1.2em; margin-bottom: 20px; text-transform: uppercase; }
-
-        .input-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; font-size: 0.75em; color: #666; margin-bottom: 5px; text-transform: uppercase; }
-        
-        input {
-            width: 100%; padding: 12px; background: #080808;
-            border: 1px solid #333; color: #fff; border-radius: 4px;
-            outline: none; transition: 0.3s;
-        }
-        input:focus { border-color: #ffcc00; }
-
-        .btn-stack { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        
-        button {
-            width: 100%; padding: 12px; border: none; border-radius: 4px;
-            font-weight: bold; cursor: pointer; transition: 0.3s;
+        .action-btn {
+            width: 100%;
+            padding: 15px;
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 10px;
+            transition: 0.3s;
         }
 
-        .login-btn { background: #ffcc00; color: #000; }
-        .login-btn:hover { background: #ffe066; }
+        .action-btn:hover {
+            background: #cc0000;
+            letter-spacing: 1px;
+        }
 
-        .reg-btn { background: transparent; color: #ffcc00; border: 1px solid #ffcc00; }
-        .reg-btn:hover { background: rgba(255, 204, 0, 0.1); }
-
-        .toggle-link { margin-top: 15px; display: block; font-size: 0.8em; color: #444; text-decoration: none; }
     </style>
 </head>
 <body>
 
-    <div class="auth-container">
-        <header>
-            <img src="https://i.ibb.co/7xsmywvY/image.avif" alt="CBRcats">
-        </header>
+    <header>
+        <img src="https://i.ibb.co/7xsmywvY/image.avif" alt="CBRcats" class="header-logo">
+    </header>
+
+    <div class="main-content">
         
-        <h2 id="auth-title">Авторизация</h2>
+        <section class="info-box">
+            <h2>О проекте <span class="beta-badge">бета-тестер</span></h2>
+            <p>Жизнь на выживание...</p>
+            <p>Посмотрим, сможешь ли ты выжить среди страшных и мутированных зомби или придется тебе вступить в фракции, чтобы не умереть одному?</p>
+            <p style="color: #666; font-size: 0.8em; margin-top: 20px;">[СИСТЕМА: CBRcats_v0.0]</p>
+        </section>
 
-        <div class="input-group">
-            <label>E-mail</label>
-            <input type="email" id="email" placeholder="cat@cbr.com">
-        </div>
+        <div class="auth-card">
+            <div id="step-1">
+                <div class="tabs">
+                    <div class="tab active" id="tab-login" onclick="setMode(true)">Вход</div>
+                    <div class="tab" id="tab-reg" onclick="setMode(false)">Регистрация</div>
+                </div>
 
-        <div class="input-group">
-            <label>Пароль</label>
-            <input type="password" id="pass" placeholder="••••••••">
-        </div>
+                <div class="input-field">
+                    <label>Почта выжившего</label>
+                    <input type="email" id="email" placeholder="email@cbrcats.com">
+                </div>
 
-        <div id="reg-fields" style="display: none;">
-            <div class="input-group">
-                <label>Повтор пароля</label>
-                <input type="password" id="confirm-pass" placeholder="••••••••">
+                <div class="input-field">
+                    <label>Ключ доступа (пароль)</label>
+                    <input type="password" id="pass" placeholder="••••••••">
+                </div>
+
+                <button class="action-btn" id="submit-btn" onclick="handleStep1()">ПРОДОЛЖИТЬ</button>
             </div>
-        </div>
 
-        <div class="btn-stack">
-            <button class="login-btn" id="main-action-btn" onclick="handleAuth()">ВОЙТИ</button>
-            <button class="reg-btn" id="toggle-btn" onclick="toggleMode()">СОЗДАТЬ АККАУНТ</button>
+            <div id="step-2" style="display: none;">
+                <h2 style="color: #ffcc00; font-size: 1em; text-align: center; text-transform: uppercase;">Создание персонажа</h2>
+                
+                <div class="input-field">
+                    <label>Вселенная</label>
+                    <div class="universe-static">Хранители Леса</div>
+                </div>
+
+                <div class="input-field">
+                    <label>Имя кота / кошки</label>
+                    <input type="text" id="cat-name" placeholder="Введите имя">
+                </div>
+
+                <div class="input-field">
+                    <label>Пол</label>
+                    <select id="cat-gender">
+                        <option value="кот">Кот</option>
+                        <option value="кошка">Кошка</option>
+                    </select>
+                </div>
+
+                <div class="input-field">
+                    <label>Статус</label>
+                    <div class="universe-static" style="color: #888;">Одиночки</div>
+                </div>
+
+                <button class="action-btn" onclick="finishRegistration()">ЗАВЕРШИТЬ СОЗДАНИЕ</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let isLoginMode = true;
+        let isLogin = true;
+        let tempAuthData = {};
 
-        function toggleMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('auth-title').innerText = isLoginMode ? 'Авторизация' : 'Регистрация';
-            document.getElementById('reg-fields').style.display = isLoginMode ? 'none' : 'block';
-            document.getElementById('main-action-btn').innerText = isLoginMode ? 'ВОЙТИ' : 'ЗАРЕГИСТРИРОВАТЬСЯ';
-            document.getElementById('toggle-btn').innerText = isLoginMode ? 'СОЗДАТЬ АККАУНТ' : 'У МЕНЯ ЕСТЬ АККАУНТ';
+        function setMode(login) {
+            isLogin = login;
+            document.getElementById('tab-login').classList.toggle('active', login);
+            document.getElementById('tab-reg').classList.toggle('active', !login);
+            document.getElementById('submit-btn').innerText = login ? 'ВОЙТИ В МИР' : 'ПРОДОЛЖИТЬ';
         }
 
-        function handleAuth() {
+        function handleStep1() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
 
-            if (!email || !pass) return alert("Заполните поля!");
+            if (!email || !pass) return alert("Заполните данные!");
 
-            if (isLoginMode) {
-                // --- ЛОГИКА ВХОДА ---
+            if (isLogin) {
                 const data = JSON.parse(localStorage.getItem('cbrcat_user_data'));
                 if (data && data.email === email && data.password === pass) {
                     window.location.href = 'Профиль/profile.html';
                 } else {
-                    alert("Неверный логин или пароль!");
+                    alert("Ошибка: Личность не подтверждена.");
                 }
             } else {
-                // --- ЛОГИКА РЕГИСТРАЦИИ ---
-                const confirm = document.getElementById('confirm-pass').value;
-                if (pass !== confirm) return alert("Пароли не совпадают!");
-
-                // Берем счетчик из памяти
-                let count = parseInt(localStorage.getItem('cbrcat_id_counter') || "0");
-                
-                // Форматируем ID (0 -> 00.00)
-                let main = Math.floor(count / 100).toString().padStart(2, '0');
-                let sub = (count % 100).toString().padStart(2, '0');
-                let newID = `${main}.${sub}`;
-
-                const newProfile = {
-                    id: newID,
-                    email: email,
-                    password: pass,
-                    name: count === 0 ? "Разработчик" : "Частокол",
-                    appearance: "",
-                    isReady: false, // Обязательно false, чтобы заставить выбрать окрас
-                    tribe: "Одиночки",
-                    gender: "кот",
-                    birthday: new Date().toLocaleDateString(),
-                    about: "История выживания..."
-                };
-
-                localStorage.setItem('cbrcat_user_data', JSON.stringify(newProfile));
-                localStorage.setItem('cbrcat_id_counter', (count + 1).toString());
-
-                alert("Регистрация успешна! Ваш ID: " + newID);
-                window.location.href = 'Профиль/profile.html';
+                tempAuthData = { email, pass };
+                document.getElementById('step-1').style.display = 'none';
+                document.getElementById('step-2').style.display = 'block';
             }
+        }
+
+        function finishRegistration() {
+            const name = document.getElementById('cat-name').value;
+            const gender = document.getElementById('cat-gender').value;
+
+            if (!name) return alert("Введите имя персонажа!");
+
+            let count = parseInt(localStorage.getItem('cbrcat_id_counter') || "144");
+            let main = Math.floor(count / 100).toString().padStart(2, '0');
+            let sub = (count % 100).toString().padStart(2, '0');
+            let newID = `${main}.${sub}`;
+
+            const profile = {
+                id: newID,
+                email: tempAuthData.email,
+                password: tempAuthData.pass,
+                name: name,
+                gender: gender,
+                tribe: "Одиночки",
+                appearance: "",
+                isReady: false,
+                birthday: new Date().toLocaleDateString()
+            };
+
+            localStorage.setItem('cbrcat_user_data', JSON.stringify(profile));
+            localStorage.setItem('cbrcat_id_counter', (count + 1).toString());
+
+            alert("Профиль создан. Ваш ID: " + newID);
+            window.location.href = 'Профиль/profile.html';
         }
     </script>
 </body>
