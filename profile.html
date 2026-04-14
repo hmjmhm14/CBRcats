@@ -163,7 +163,6 @@
             outline: none;
         }
 
-        /* MODALS */
         .modal {
             display: none;
             position: fixed;
@@ -194,7 +193,6 @@
             font-family: inherit;
         }
 
-        /* Tribe Panel Specific */
         .smell-tag { font-size: 1.4em; color: #00ffcc; font-weight: bold; display: block; margin-bottom: 2px; }
         .tribe-name { font-size: 0.9em; color: #888; text-transform: uppercase; }
     </style>
@@ -236,7 +234,11 @@
                 </div>
                 <div class="info-row">
                     <span class="info-label">Пол</span>
-                    <span id="display-gender" style="color:#ffcc00; font-weight:bold;">кот</span>
+                    <span id="display-gender" style="color:#ffcc00; font-weight:bold;">--</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Локация спавна (ID)</span>
+                    <span id="display-spawn-loc" style="color:#00ffcc; font-weight:bold;">--</span>
                 </div>
 
                 <div class="about-section">
@@ -272,7 +274,7 @@
     <div id="modal-news" class="modal">
         <div class="modal-win">
             <div class="modal-header"><h2>НОВОСТИ CBRcats</h2><button class="bb-btn" onclick="closeModal('news')">X</button></div>
-            <div style="font-size:0.9em;"><b>14.04.2026</b> - Система ID стабилизирована. Добавлены функции управления территориями.</div>
+            <div style="font-size:0.9em;"><b>14.04.2026</b> - Система ID стабилизирована. Добавлены функции управления территориями по ID локаций.</div>
         </div>
     </div>
 
@@ -299,16 +301,16 @@
                 <input type="text" id="new-tribe-smell" class="settings-input" placeholder="Напр: Хвоя и сырость">
                 <label class="info-label">Иконка запаха (100x100):</label>
                 <input type="text" id="new-tribe-icon" class="settings-input" placeholder="Ссылка на png">
-                <label class="info-label">Точка спавна (x,y):</label>
-                <input type="text" id="new-tribe-spawn" class="settings-input" placeholder="Напр: 500,300">
-                <button class="select-btn" style="margin-top:10px; background:#00ffcc;" onclick="alert('Фракция обновлена!')">СОЗДАТЬ/ОБНОВИТЬ</button>
+                <label class="info-label">ID Локации спавна:</label>
+                <input type="text" id="new-tribe-spawn-id" class="settings-input" placeholder="Напр: loc_mountain_clan">
+                <button class="select-btn" style="margin-top:10px; background:#00ffcc;" onclick="alert('Данные фракции и спавн-локация обновлены!')">ОБНОВИТЬ</button>
             </div>
 
             <div id="tribe-list">
                 <p class="info-label">Активные территории:</p>
                 <div style="background:#0a0a0a; padding:10px; border:1px solid #222;">
                     <span class="smell-tag">⛰️ СКАЛЫ</span>
-                    <span class="tribe-name">Горный Клан</span>
+                    <span class="tribe-name">Горный Клан (ID: loc_rocks_01)</span>
                     <button class="bb-btn" style="float:right; color:#ff3333;" onclick="confirm('Удалить племя?')">УДАЛИТЬ</button>
                 </div>
             </div>
@@ -318,7 +320,6 @@
     <script>
         let userData = JSON.parse(localStorage.getItem('cbrcat_user_data'));
 
-        // Исправленная функция ID
         function formatID(id) {
             if (id === "00.00") return "00.00";
             if (typeof id === 'number') {
@@ -332,7 +333,6 @@
         window.onload = function() {
             if (!userData) { window.location.href = '../index.html'; return; }
 
-            // Если ты первый юзер, принудительно ставим 00.00
             let checkID = localStorage.getItem('cbrcat_id_counter');
             if (checkID === "1" && userData.name === "Разработчик") {
                 userData.id = "00.00";
@@ -345,6 +345,7 @@
             document.getElementById('edit-name').value = userData.name;
             document.getElementById('edit-about').value = userData.about || "";
             document.getElementById('display-gender').innerText = userData.gender || "кот";
+            document.getElementById('display-spawn-loc').innerText = userData.spawnLocID || "loc_main_hub";
             
             document.getElementById('set-email').value = userData.email || "";
             document.getElementById('set-pass').value = userData.password || "";
