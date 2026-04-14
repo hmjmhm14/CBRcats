@@ -12,13 +12,12 @@
             background: #050505;
             color: #d1d1d1;
             font-family: 'Courier New', Courier, monospace;
-            /* Убрал overflow: hidden, чтобы можно было прокручивать страницу, если контент не влезает */
         }
 
         .profile-wrapper {
             width: 95vw;
-            max-width: 1000px; /* Ограничил максимальную ширину для красоты */
-            margin: 50px auto; /* Центрирование с отступом сверху и снизу */
+            max-width: 1000px;
+            margin: 50px auto;
             background: #000;
             border: 2px solid #ffcc00;
             border-radius: 12px;
@@ -26,7 +25,6 @@
             flex-direction: column;
             padding: 25px;
             box-shadow: 0 0 30px rgba(255, 204, 0, 0.1);
-            /* Убрал фиксированную высоту 90vh */
         }
 
         .profile-header {
@@ -58,11 +56,7 @@
         }
         .exit-btn:hover { background: #ff3333; color: #fff; }
 
-        .main-content {
-            display: flex;
-            gap: 30px;
-            /* Убрал flex: 1 и min-height: 0, чтобы блок рос вместе с контентом */
-        }
+        .main-content { display: flex; gap: 30px; }
 
         .left-col {
             flex: 0 0 300px;
@@ -79,21 +73,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
             overflow: hidden;
         }
 
-        #profile-img {
-            max-width: 100%;
-            max-height: 100%;
-            display: none;
-        }
-
-        .no-skin-text {
-            color: #222;
-            font-size: 0.8em;
-            text-align: center;
-        }
+        #profile-img { max-width: 100%; max-height: 100%; display: none; }
 
         .select-btn {
             width: 100%;
@@ -104,17 +87,11 @@
             font-weight: bold;
             cursor: pointer;
             border-radius: 4px;
-            text-decoration: none;
             text-align: center;
-            transition: 0.3s;
+            text-decoration: none;
         }
-        .select-btn:hover { background: #ffaa00; }
 
-        .menu-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+        .menu-btns { display: flex; flex-direction: column; gap: 8px; }
 
         .menu-btn {
             background: #111;
@@ -122,41 +99,14 @@
             border: 1px solid #222;
             padding: 10px;
             text-align: center;
-            text-decoration: none;
-            font-size: 0.9em;
-            transition: 0.2s;
             cursor: pointer;
+            font-size: 0.9em;
         }
         
-        .menu-btn.locked {
-            opacity: 0.2;
-            cursor: not-allowed;
-            filter: grayscale(1);
-        }
+        .menu-btn.locked { opacity: 0.2; cursor: not-allowed; }
+        .menu-btn:not(.locked):hover { border-color: #ffcc00; color: #ffcc00; }
 
-        .menu-btn:not(.locked):hover {
-            border-color: #ffcc00;
-            color: #ffcc00;
-        }
-
-        .admin-btn {
-            border-color: #00ffcc !important;
-            color: #00ffcc !important;
-            display: none;
-        }
-
-        .right-col {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .info-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .right-col { flex: 1; display: flex; flex-direction: column; gap: 20px; }
 
         .info-row {
             display: flex;
@@ -178,50 +128,35 @@
             font-weight: bold;
             font-family: inherit;
             outline: none;
-            width: 200px;
         }
 
         .about-section {
             background: #080808;
             border: 1px solid #222;
             padding: 20px;
-            border-radius: 4px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            /* Убрал flex: 1 */
         }
-
-        .toolbar { display: flex; gap: 5px; margin-bottom: 5px; }
-        .bb-btn {
-            background: #151515;
-            border: 1px solid #333;
-            color: #777;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-size: 0.8em;
-        }
-        .bb-btn:hover { color: #ffcc00; border-color: #ffcc00; }
 
         .about-area {
             width: 100%;
-            height: 200px; /* Задал фиксированную высоту для текстового поля */
+            height: 150px;
             background: #050505;
             border: 1px solid #333;
             color: #bbb;
             padding: 15px;
-            font-family: inherit;
-            resize: vertical; /* Разрешил менять размер только по вертикали */
+            resize: vertical;
             outline: none;
-            line-height: 1.5;
         }
 
+        /* MODALS */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
+            background: rgba(0,0,0,0.9);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -229,11 +164,20 @@
         .modal-win {
             background: #000;
             border: 2px solid #ffcc00;
-            width: 700px;
-            max-height: 80vh;
+            width: 500px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            gap: 15px;
+        }
+        .settings-input {
+            width: 100%;
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            margin-top: 5px;
+            font-family: inherit;
         }
     </style>
 </head>
@@ -248,67 +192,55 @@
         <div class="main-content">
             <div class="left-col">
                 <div class="avatar-box">
-                    <span class="no-skin-text" id="no-skin">ОКРАС НЕ ВЫБРАН</span>
-                    <img id="profile-img" src="" alt="Кот">
+                    <span id="no-skin" style="color:#222; font-size:0.8em;">ОКРАС НЕ ВЫБРАН</span>
+                    <img id="profile-img" src="">
                 </div>
                 <a href="okras.html" id="btn-okras" class="select-btn">ВЫБРАТЬ ОКРАС</a>
                 
                 <div class="menu-btns">
                     <a href="../игровая/game.html" class="menu-btn game-link locked">ИГРОВАЯ</a>
-                    <div class="menu-btn locked" onclick="openModal('chat')">ГРУППЫ / ЧАТЫ</div>
-                    <div class="menu-btn locked" onclick="openModal('pm')">ЛИЧНЫЕ СООБЩЕНИЯ</div>
-                    <div class="menu-btn locked" onclick="openModal('news')">НОВОСТИ</div>
-                    <div class="menu-btn admin-btn" id="link-admin" onclick="openModal('admin')">АДМИН-ПАНЕЛЬ</div>
+                    <div class="menu-btn locked" onclick="openModal('settings')">НАСТРОЙКИ АККАУНТА</div>
+                    <div class="menu-btn locked">ЧАТЫ</div>
+                    <div class="menu-btn admin-btn" id="link-admin" style="display:none; color:#00ffcc; border-color:#00ffcc;" onclick="alert('Панель админа')">АДМИН-ПАНЕЛЬ</div>
                 </div>
             </div>
 
             <div class="right-col">
-                <div class="info-grid">
-                    <div class="info-row">
-                        <span class="info-label">ID Персонажа</span>
-                        <span class="info-value" id="display-id">--.--</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Имя (изменяемо)</span>
-                        <input type="text" id="edit-name">
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Статус</span>
-                        <span class="info-value">Одиночки</span>
-                    </div>
+                <div class="info-row">
+                    <span class="info-label">ID Персонажа</span>
+                    <span id="display-id" style="color:#ffcc00; font-weight:bold;">--.--</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Имя (изменяемо)</span>
+                    <input type="text" id="edit-name">
                 </div>
 
                 <div class="about-section">
-                    <div class="toolbar">
-                        <button class="bb-btn" title="Жирный" onclick="insertBB('[b]', '[/b]')">[B]</button>
-                        <button class="bb-btn" title="Курсив" onclick="insertBB('[i]', '[/i]')">[I]</button>
-                        <button class="bb-btn" title="Картинка" onclick="insertBB('[img]', '[/img]')">[IMG]</button>
-                    </div>
-                    <textarea id="edit-about" class="about-area" placeholder="Расскажите о своем герое..."></textarea>
-                    <button class="select-btn" style="background: transparent; border: 1px solid #4caf50; color: #4caf50;" onclick="saveAboutData()">СОХРАНИТЬ ИЗМЕНЕНИЯ</button>
+                    <span class="info-label">О себе:</span>
+                    <textarea id="edit-about" class="about-area"></textarea>
+                    <button class="select-btn" style="background:transparent; border:1px solid #4caf50; color:#4caf50;" onclick="saveAboutData()">СОХРАНИТЬ ПРОФИЛЬ</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="modal-admin" class="modal">
-        <div class="modal-win" style="border-color: #00ffcc;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                <h2 style="color:#00ffcc; margin:0; font-size:1em;">АДМИН-ИНСТРУМЕНТЫ</h2>
-                <button class="bb-btn" onclick="closeModal('admin')">[X]</button>
+    <div id="modal-settings" class="modal">
+        <div class="modal-win">
+            <h2 style="color:#ffcc00; margin:0; font-size:1.2em;">НАСТРОЙКИ</h2>
+            
+            <div>
+                <label class="info-label">Новая почта:</label>
+                <input type="email" id="set-email" class="settings-input" placeholder="example@mail.com">
             </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; color:#666; font-size:0.8em;">
-                <div style="border:1px solid #222; padding:10px;">
-                    <p>ID ИГРОКА:</p>
-                    <input type="text" id="adm-id" style="width:100%; background:#111; border:1px solid #333; color:#fff; padding:5px;">
-                    <button class="bb-btn" style="width:100%; margin-top:10px;" onclick="alert('Бан выдан')">БАН</button>
-                    <button class="bb-btn" style="width:100%; margin-top:5px;" onclick="alert('Мут выдан')">МУТ</button>
-                </div>
-                <div style="border:1px solid #222; padding:10px;">
-                    <p>ТЕЛЕПОРТАЦИЯ:</p>
-                    <input type="text" placeholder="ID локации" style="width:100%; background:#111; border:1px solid #333; color:#fff; padding:5px;">
-                    <button class="bb-btn" style="width:100%; margin-top:10px;">ТЕЛЕПОРТИРОВАТЬ</button>
-                </div>
+
+            <div>
+                <label class="info-label">Новый пароль:</label>
+                <input type="password" id="set-pass" class="settings-input" placeholder="********">
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="select-btn" onclick="saveSettings()">СОХРАНИТЬ</button>
+                <button class="select-btn" style="background:#222; color:#fff;" onclick="closeModal('settings')">ЗАКРЫТЬ</button>
             </div>
         </div>
     </div>
@@ -326,15 +258,19 @@
         }
 
         window.onload = function() {
-            if (!userData) return window.location.href = '../index.html';
-            userData.id = formatID(userData.id);
+            if (!userData) { window.location.href = '../index.html'; return; }
 
+            const fixedID = formatID(userData.id);
+            document.getElementById('display-id').innerText = fixedID;
             document.getElementById('header-name').innerText = userData.name.toUpperCase();
-            document.getElementById('display-id').innerText = userData.id;
             document.getElementById('edit-name').value = userData.name;
             document.getElementById('edit-about').value = userData.about || "";
             
-            if (userData.appearance && userData.appearance !== "") {
+            // Настройки
+            document.getElementById('set-email').value = userData.email || "";
+            document.getElementById('set-pass').value = userData.password || "";
+
+            if (userData.appearance) {
                 document.getElementById('profile-img').src = userData.appearance;
                 document.getElementById('profile-img').style.display = 'block';
                 document.getElementById('no-skin').style.display = 'none';
@@ -343,30 +279,28 @@
                 document.querySelector('.game-link').classList.remove('locked');
             }
 
-            if (userData.id === "00.00") {
-                document.getElementById('link-admin').style.display = 'block';
-            }
+            if (fixedID === "00.00") document.getElementById('link-admin').style.display = 'block';
         };
-
-        function openModal(m) { document.getElementById('modal-' + m).style.display = 'flex'; }
-        function closeModal(m) { document.getElementById('modal-' + m).style.display = 'none'; }
 
         function saveAboutData() {
             userData.name = document.getElementById('edit-name').value;
             userData.about = document.getElementById('edit-about').value;
             localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
             document.getElementById('header-name').innerText = userData.name.toUpperCase();
-            alert("Профиль обновлен!");
+            alert("Профиль сохранен!");
         }
 
-        function exitWithoutSave() {
-            window.location.href = '../index.html';
+        function saveSettings() {
+            userData.email = document.getElementById('set-email').value;
+            userData.password = document.getElementById('set-pass').value;
+            localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
+            alert("Данные аккаунта обновлены!");
+            closeModal('settings');
         }
 
-        function insertBB(o, c) {
-            const a = document.getElementById('edit-about');
-            a.value = a.value.substring(0, a.selectionStart) + o + a.value.substring(a.selectionStart, a.selectionEnd) + c + a.value.substring(a.selectionEnd);
-        }
+        function openModal(m) { document.getElementById('modal-' + m).style.display = 'flex'; }
+        function closeModal(m) { document.getElementById('modal-' + m).style.display = 'none'; }
+        function exitWithoutSave() { window.location.href = '../index.html'; }
     </script>
 </body>
 </html>
