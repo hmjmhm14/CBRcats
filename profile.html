@@ -248,31 +248,31 @@
 
     <div id="modal-chat" class="modal">
         <div class="modal-win">
-            <div class="modal-header"><h2>УПРАВЛЕНИЕ ЧАТАМИ</h2><button class="bb-btn" onclick="closeModal('chat')">X</button></div>
+            <div class="modal-header"><h2>ЧАТЫ</h2><button class="bb-btn" onclick="closeModal('chat')">X</button></div>
             
             <div style="background:#0a0a0a; padding:10px; border:1px solid #222; margin-bottom:10px;">
-                <input type="text" id="new-chat-name" class="settings-input" placeholder="Название чата (напр: Племя)">
+                <input type="text" id="new-chat-name" class="settings-input" placeholder="Название чата">
                 <select id="new-chat-mode" class="settings-input" style="margin-top:5px;">
-                    <option value="group">Группа (пишут все)</option>
-                    <option value="channel">Канал (пишет только владелец)</option>
+                    <option value="group">Группа (все пишут)</option>
+                    <option value="channel">Канал (только владелец)</option>
                 </select>
-                <button class="select-btn" style="margin-top:10px;" onclick="createNewChat()">СОЗДАТЬ / ОБНОВИТЬ</button>
+                <button class="select-btn" style="margin-top:10px;" onclick="initChat()">СОЗДАТЬ</button>
             </div>
 
             <div class="chat-container" id="global-chat-box"></div>
 
-            <div id="chat-admin-panel" style="display:none; border-top:1px solid #333; padding-top:10px; margin-top:10px;">
-                <p style="font-size:0.7em; color:#ffcc00; margin:0 0 5px 0;">ПАНЕЛЬ ВЛАДЕЛЬЦА:</p>
+            <div id="chat-owner-panel" style="display:none; border-top:1px solid #333; padding-top:10px; margin-top:10px;">
+                <p style="font-size:0.7em; color:#ffcc00; margin:0 0 5px 0;">УПРАВЛЕНИЕ ВЛАДЕЛЬЦА:</p>
                 <div style="display:flex; gap:5px;">
-                    <input type="text" id="chat-user-target" class="settings-input" style="width:100px; margin:0" placeholder="ID игрока">
-                    <button class="bb-btn" onclick="manageChatAction('transfer')">ПРАВА</button>
-                    <button class="bb-btn" onclick="manageChatAction('kick')">КИК</button>
-                    <button class="bb-btn" style="color:#ff3333" onclick="manageChatAction('delete')">УДАЛИТЬ</button>
+                    <input type="text" id="chat-admin-target" class="settings-input" style="width:100px; margin:0" placeholder="ID игрока">
+                    <button class="bb-btn" onclick="chatAdminAction('transfer')">ПРАВА</button>
+                    <button class="bb-btn" onclick="chatAdminAction('kick')">КИК</button>
+                    <button class="bb-btn" style="color:#ff3333" onclick="chatAdminAction('delete')">УДАЛИТЬ</button>
                 </div>
             </div>
 
-            <div id="chat-input-zone" style="display:flex; gap:5px; margin-top:10px;">
-                <input type="text" id="chat-input" class="settings-input" placeholder="Сообщение...">
+            <div id="chat-input-area" style="display:flex; gap:5px; margin-top:10px;">
+                <input type="text" id="chat-input" class="settings-input" style="margin:0" placeholder="Сообщение...">
                 <button class="bb-btn" onclick="sendChatMessage()">></button>
             </div>
         </div>
@@ -282,16 +282,14 @@
         <div class="modal-win">
             <div class="modal-header"><h2>ЛИЧНЫЕ СООБЩЕНИЯ</h2><button class="bb-btn" onclick="closeModal('pm')">X</button></div>
             <div class="pm-tabs">
-                <div class="pm-tab active" onclick="filterPM('inbox', this)">ПОЛУЧАТЕЛЬ (Входящие)</div>
-                <div class="pm-tab" onclick="filterPM('sent', this)">ОТПРАВИТЕЛЬ (Исходящие)</div>
+                <div class="pm-tab active" onclick="loadPMs('inbox', this)">ПОЛУЧАТЕЛЬ</div>
+                <div class="pm-tab" onclick="loadPMs('sent', this)">ОТПРАВИТЕЛЬ</div>
             </div>
-            <div id="pm-viewer" style="height:150px; overflow-y:auto; background:#050505; border:1px solid #222; padding:10px; font-size:0.85em;">
-                Выберите вкладку для просмотра...
-            </div>
+            <div id="pm-display-list" style="height:150px; overflow-y:auto; background:#050505; border:1px solid #222; padding:10px; font-size:0.85em;"></div>
             <div style="margin-top:10px;">
-                <input type="text" id="pm-target-id" class="settings-input" placeholder="ID получателя">
-                <textarea id="pm-text-content" class="about-area" style="height:60px; margin-top:5px;" placeholder="Ваше сообщение..."></textarea>
-                <button class="select-btn" onclick="sendPrivateMessage()">ОТПРАВИТЬ</button>
+                <input type="text" id="pm-to-id" class="settings-input" placeholder="ID получателя">
+                <textarea id="pm-body-text" class="about-area" style="height:60px; margin-top:5px;" placeholder="Текст..."></textarea>
+                <button class="select-btn" onclick="processPM()">ОТПРАВИТЬ</button>
             </div>
         </div>
     </div>
@@ -375,161 +373,91 @@
 
     <script>
         let userData = JSON.parse(localStorage.getItem('cbrcat_user_data'));
+    let activeChat = { owner: null, type: 'group', tribe: 'Одиночки' };
 
-        window.onload = function() {
-            if (!userData) { window.location.href = 'index.html'; return; }
+    window.onload = function() {
+        if (!userData) { window.location.href = 'index.html'; return; }
+        refreshProfile();
+    };
 
-            // Вывод данных
-            document.getElementById('display-id').innerText = userData.id || "--.--";
-            document.getElementById('header-name').innerText = (userData.name || "НЕИЗВЕСТНО").toUpperCase();
-            document.getElementById('edit-name').value = userData.name || "";
-            document.getElementById('edit-about').value = userData.about || "";
-            document.getElementById('display-gender').innerText = userData.gender || "кот";
-            document.getElementById('display-tribe').innerText = userData.tribe || "Одиночки";
-
-            if (userData.tribeSmellIcon) {
-                const sImg = document.getElementById('display-smell');
-                sImg.src = userData.tribeSmellIcon;
-                sImg.style.display = 'block';
-            }
-
-            // Окрас
-            if (userData.appearance) {
-                document.getElementById('profile-img').src = userData.appearance;
-                document.getElementById('profile-img').style.display = 'block';
-                document.getElementById('no-skin').style.display = 'none';
-                document.getElementById('btn-okras').style.display = 'none';
-                document.querySelectorAll('.menu-btn.locked').forEach(el => el.classList.remove('locked'));
-            }
-
-            // Роли (00.00 - Создатель)
-            if (userData.id === "00.00") {
-                document.getElementById('link-admin').style.display = 'block';
-                document.getElementById('link-tribes').style.display = 'block';
-                document.getElementById('dev-only-tools').style.display = 'block';
-                document.getElementById('btn-edit-news').style.display = 'block';
-            } else if (userData.status === "admin") {
-                document.getElementById('link-admin').style.display = 'block';
-            }
-
-            // Смена имени по пробелу
-            document.getElementById('edit-name').addEventListener('keydown', function(e) {
-                if (e.code === 'Space') {
-                    userData.name = this.value.trim();
-                    document.getElementById('header-name').innerText = userData.name.toUpperCase();
-                    localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
-                }
-            });
-        };
-
-        // Логика BB-кодов
-        function insertBB(fieldId, o, c) {
-            const a = document.getElementById(fieldId);
-            const start = a.selectionStart;
-            const end = a.selectionEnd;
-            const text = a.value;
-            a.value = text.substring(0, start) + o + text.substring(start, end) + c + text.substring(end);
+    function refreshProfile() {
+        document.getElementById('display-id').innerText = userData.id;
+        document.getElementById('header-name').innerText = userData.name.toUpperCase();
+        document.getElementById('display-tribe').innerText = userData.tribe;
+        document.getElementById('edit-name').value = userData.name;
+        document.getElementById('set-email').value = userData.email || "";
+        document.getElementById('edit-about').value = userData.about || "";
+        if (userData.appearance) {
+            const img = document.getElementById('profile-img');
+            img.src = userData.appearance; img.style.display = 'block';
+            document.getElementById('no-skin').style.display = 'none';
+            document.getElementById('btn-okras').style.display = 'none';
+            document.querySelectorAll('.menu-btn.locked').forEach(b => b.classList.remove('locked'));
         }
+        if(userData.id === "00.00") document.getElementById('link-admin').style.display = 'block';
+    }
 
-        function sendChatMessage() {
-            const inp = document.getElementById('chat-input');
-            if(!inp.value) return;
-            const msg = document.createElement('div');
-            msg.className = 'chat-msg';
-            msg.innerHTML = `<b>${userData.name}:</b> ${inp.value}`;
-            document.getElementById('global-chat-box').appendChild(msg);
-            inp.value = '';
-        }
+    // ЛОГИКА ЧАТА
+    function initChat() {
+        const title = document.getElementById('new-chat-name').value;
+        const mode = document.getElementById('new-chat-mode').value;
+        if(!title) return alert("Введите название!");
+        activeChat = { title: title, type: mode, owner: userData.id, tribe: userData.tribe };
+        document.getElementById('global-chat-box').innerHTML = `<div style="color:#ffcc00; text-align:center; font-size:0.7em;">--- ${mode === 'group' ? 'ГРУППА' : 'КАНАЛ'}: ${title} ---</div>`;
+        document.getElementById('chat-owner-panel').style.display = 'block';
+    }
 
-        function switchPMTab(type, el) {
-            document.querySelectorAll('.pm-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('pm-write-zone').style.display = type === 'sent' ? 'block' : 'none';
-        }
+    function sendChatMessage() {
+        const inp = document.getElementById('chat-input');
+        if(activeChat.type === 'channel' && userData.id !== activeChat.owner) return alert("Только владелец пишет в канал!");
+        if(activeChat.tribe !== userData.tribe) return alert("Вы покинули это племя!");
+        if(!inp.value) return;
+        document.getElementById('global-chat-box').innerHTML += `<div><b>${userData.name}:</b> ${inp.value}</div>`;
+        inp.value = '';
+    }
 
-        function saveNews() {
-            const txt = document.getElementById('news-input').value;
-            document.getElementById('news-content').innerHTML = txt;
-            alert("Новость опубликована!");
-        }
+    function chatAdminAction(act) {
+        const target = document.getElementById('chat-admin-target').value;
+        if(act === 'delete') {
+            document.getElementById('global-chat-box').innerHTML = "";
+            document.getElementById('chat-owner-panel').style.display = 'none';
+        } else if(act === 'transfer') {
+            activeChat.owner = target;
+            alert("Права переданы " + target);
+            document.getElementById('chat-owner-panel').style.display = 'none';
+        } else { alert("Игрок " + target + " удален."); }
+    }
 
-        function saveTribeSettings() {
-            userData.tribe = document.getElementById('new-tribe-name').value;
-            userData.tribeSmellIcon = document.getElementById('new-tribe-icon-url').value;
-            localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
-            location.reload();
-        }
+    // ЛОГИКА ЛС
+    function loadPMs(tab, el) {
+        document.querySelectorAll('.pm-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        const box = document.getElementById('pm-display-list');
+        if(tab === 'inbox') {
+            box.innerHTML = `<div style="color:#4caf50">Сообщения для вашего ID (${userData.id}):</div><div class="chat-msg">Привет от системы!</div>`;
+        } else { box.innerHTML = `Исходящие пусты.`; }
+    }
 
-        function deletePlayerAction() {
-            let tid = document.getElementById('target-id').value;
-            if(tid === "00.00") return alert("Невозможно!");
-            if(confirm("Удалить игрока " + tid + "?")) { alert("Удалено."); }
-        }
+    function processPM() { alert("Отправлено игроку " + document.getElementById('pm-to-id').value); }
 
-        function saveAboutData() {
-            // Проверка смены фракции для чатов
-            if (activeChat && activeChat.tribe !== userData.tribe) {
-                document.getElementById('global-chat-box').innerHTML = "<div style='color:red; font-size:0.7em;'>Вы покинули фракцию. Доступ к чату закрыт.</div>";
-                document.getElementById('chat-owner-panel').style.display = 'none';
-            }
+    // НАСТРОЙКИ (РАБОЧИЕ)
+    function saveSettings() {
+        userData.email = document.getElementById('set-email').value;
+        userData.password = document.getElementById('set-pass').value; // ТЕПЕРЬ СОХРАНЯЕТ
+        localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
+        alert("Данные обновлены!");
+        closeModal('settings');
+    }
 
-            userData.about = document.getElementById('edit-about').value;
-            localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
-            alert("История сохранена!");
-        }
+    function saveAboutData() {
+        userData.about = document.getElementById('edit-about').value;
+        localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
+        alert("Сохранено!");
+    }
 
-       function saveSettings() {
-            userData.email = document.getElementById('set-email').value;
-            userData.password = document.getElementById('set-pass').value; // Сохраняем пароль
-            localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
-            alert("Данные аккаунта (почта и пароль) успешно обновлены!");
-            closeModal('settings');
-        }
-
-        function openModal(m) { document.getElementById('modal-' + m).style.display = 'flex'; }
-        function closeModal(m) { document.getElementById('modal-' + m).style.display = 'none'; }
-        function exitWithoutSave() { window.location.href = 'index.html'; }
-
-        // --- НОВЫЕ ФУНКЦИИ УПРАВЛЕНИЯ ---
-        let activeChat = { owner: null, type: 'group', tribe: 'Одиночки' };
-
-        function initChat() {
-            const title = document.getElementById('new-chat-name').value;
-            const mode = document.getElementById('new-chat-mode').value;
-            if(!title) return alert("Введите название!");
-
-            activeChat = { title: title, type: mode, owner: userData.id, tribe: userData.tribe };
-            document.getElementById('global-chat-box').innerHTML = `<div style="color:#ffcc00; text-align:center; font-size:0.7em;">--- ${mode === 'group' ? 'ГРУППА' : 'КАНАЛ'}: ${title} ---</div>`;
-            document.getElementById('chat-owner-panel').style.display = 'block';
-        }
-
-        function chatAdminAction(act) {
-            const target = document.getElementById('chat-admin-target').value;
-            if(act === 'delete') {
-                document.getElementById('global-chat-box').innerHTML = "";
-                document.getElementById('chat-owner-panel').style.display = 'none';
-                activeChat.owner = null;
-            } else if(act === 'transfer') {
-                if(!target) return alert("Введите ID игрока");
-                activeChat.owner = target;
-                alert("Права переданы ID " + target);
-                document.getElementById('chat-owner-panel').style.display = 'none';
-            } else if(act === 'kick') {
-                alert("Игрок " + target + " исключен.");
-            }
-        }
-
-        // Фильтр ЛС по ID (Получатель читает только свои)
-        function loadPMs(tab, el) {
-            document.querySelectorAll('.pm-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            const box = document.getElementById('pm-display-list');
-            if(tab === 'inbox') {
-                box.innerHTML = `<div style="color:#4caf50">Входящие для ${userData.id}:</div><div class="chat-msg">Привет от системы!</div>`;
-            } else {
-                box.innerHTML = `<div style="color:#888">Ваши исходящие...</div>`;
-            }
-        }
+    function openModal(m) { document.getElementById('modal-' + m).style.display = 'flex'; }
+    function closeModal(m) { document.getElementById('modal-' + m).style.display = 'none'; }
+    function exitWithoutSave() { window.location.href = 'index.html'; }
     </script>
 </body>
 </html>
