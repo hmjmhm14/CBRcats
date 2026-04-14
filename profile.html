@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CBRcats — Личный кабинет</title>
+    <title>CBRcats — Профиль</title>
     <style>
-        :root { --gold: #ffcc00; --red: #ff0000; --bg: #050505; }
+        :root { --gold: #ffcc00; --red: #ff3333; --bg: #050505; --dark: #000; --mid: #111; --border: #222; }
         * { box-sizing: border-box; }
         body { 
             margin: 0; background: var(--bg); color: #d1d1d1; 
@@ -15,23 +15,23 @@
 
         /* КАРТОЧКА ПРОФИЛЯ */
         .profile-card {
-            width: 850px; background: #000; border: 2px solid var(--gold);
+            width: 850px; background: var(--dark); border: 2px solid var(--gold);
             border-radius: 12px; padding: 25px; box-shadow: 0 0 30px rgba(255, 204, 0, 0.1);
             display: flex; flex-direction: column; gap: 20px;
         }
 
         .header { 
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #222; padding-bottom: 15px;
+            border-bottom: 1px solid var(--border); padding-bottom: 15px;
         }
-        .header h1 { margin: 0; color: var(--gold); font-size: 1.5em; text-transform: uppercase; }
+        .header h1 { margin: 0; color: var(--gold); font-size: 1.4em; text-transform: uppercase; }
 
         .main-layout { display: flex; gap: 30px; }
 
         /* ЛЕВАЯ КОЛОНКА */
         .left-side { flex: 0 0 260px; display: flex; flex-direction: column; gap: 10px; }
         .avatar-box {
-            width: 260px; height: 320px; background: #0a0a0a; border: 1px solid #333;
+            width: 260px; height: 320px; background: #0a0a0a; border: 1px solid var(--border);
             display: flex; justify-content: center; align-items: center; overflow: hidden;
             position: relative;
         }
@@ -39,10 +39,10 @@
         .no-skin { font-size: 0.7em; color: #444; text-align: center; padding: 10px; }
 
         .btn {
-            display: block; width: 100%; padding: 12px; background: #111;
-            color: var(--gold); border: 1px solid #333; text-align: center;
+            display: block; width: 100%; padding: 12px; background: var(--mid);
+            color: var(--gold); border: 1px solid var(--border); text-align: center;
             text-decoration: none; font-weight: bold; font-size: 0.8em; transition: 0.3s;
-            cursor: pointer;
+            cursor: pointer; font-family: inherit;
         }
         .btn:hover:not(.locked) { background: #1a1a1a; border-color: var(--gold); }
         .btn.locked { opacity: 0.2; cursor: not-allowed; filter: grayscale(1); }
@@ -60,11 +60,28 @@
         }
         .editable-input:hover { border-color: #333; }
 
-        .about-section { margin-top: 10px; }
-        .about-area {
-            width: 100%; height: 160px; background: #080808; border: 1px solid #222;
-            color: #bbb; padding: 10px; font-family: inherit; resize: none; margin-top: 5px;
+        /* СЕКЦИЯ О СЕБЕ И ВВ-КОДЫ */
+        .about-section { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+        
+        .toolbar { 
+            display: flex; gap: 2px; background: #080808; 
+            padding: 2px; border: 1px solid var(--border); 
+            border-bottom: none; border-radius: 4px 4px 0 0;
         }
+        .bb-btn {
+            background: #151515; border: 1px solid #222; color: #777;
+            padding: 5px 8px; cursor: pointer; font-family: inherit; font-size: 0.75em;
+            text-transform: uppercase; font-weight: bold;
+        }
+        .bb-btn:hover { color: var(--gold); background: #222; border-color: #333; }
+        .bb-btn.colored:hover { color: var(--red); }
+
+        .about-area {
+            width: 100%; height: 180px; background: #080808; border: 1px solid var(--border);
+            border-radius: 0 0 4px 4px; color: #bbb; padding: 10px; 
+            font-family: inherit; resize: none; outline: none; transition: 0.2s;
+        }
+        .about-area:focus { border-color: var(--gold); background: #0a0a0a; }
 
         /* ОКНО ЧАТА (MODAL) */
         #chat-modal {
@@ -72,14 +89,14 @@
             background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center;
         }
         .chat-container {
-            width: 900px; height: 600px; background: #000; border: 1px solid var(--gold);
+            width: 900px; height: 600px; background: var(--dark); border: 1px solid var(--gold);
             display: flex; position: relative;
         }
-        .chat-sidebar { width: 200px; border-right: 1px solid #222; display: flex; flex-direction: column; }
+        .chat-sidebar { width: 200px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .chat-tab { padding: 15px; cursor: pointer; border-bottom: 1px solid #111; font-size: 0.8em; color: #555; }
         .chat-tab.active { color: var(--gold); background: #0a0a0a; }
         .chat-main { flex: 1; display: flex; flex-direction: column; padding: 15px; }
-        .chat-msgs { flex: 1; background: #050505; border: 1px solid #222; overflow-y: auto; padding: 10px; margin-bottom: 10px; }
+        .chat-msgs { flex: 1; background: #050505; border: 1px solid var(--border); overflow-y: auto; padding: 10px; margin-bottom: 10px; }
         .msg-line { margin-bottom: 8px; font-size: 0.9em; border-bottom: 1px solid #0d0d0d; }
         .msg-line b { color: var(--gold); }
     </style>
@@ -89,7 +106,7 @@
 <div class="profile-card">
     <div class="header">
         <h1 id="top-name">ЗАГРУЗКА...</h1>
-        <button class="btn" style="width: auto; padding: 5px 15px; color: var(--red); border-color: var(--red);" onclick="saveAndExit()">ВЫХОД</button>
+        <button class="btn" style="width: auto; padding: 5px 15px; color: var(--red); border-color: var(--red); background: transparent;" onclick="saveAndExit()">ВЫХОД</button>
     </div>
 
     <div class="main-layout">
@@ -112,7 +129,7 @@
         <div class="right-side">
             <div class="info-row">
                 <span class="label">ID Персонажа</span>
-                <span class="val" id="display-id">#00.00</span>
+                <span class="val" id="display-id">--.--</span>
             </div>
             <div class="info-row">
                 <span class="label">Имя (изменяемо)</span>
@@ -128,10 +145,24 @@
             </div>
 
             <div class="about-section">
-                <span class="label">О себе (BB-коды / вставка ссылок)</span>
-                <textarea id="edit-about" class="about-area" placeholder="Напиши свою историю..."></textarea>
-                <div style="font-size: 0.6em; color: #444; margin-top: 5px;">
-                    [b]жирный[/b] [i]курсив[/i] [img]ссылка[/img] | CTRL+V для вставки картинки
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="label">О себе</span>
+                    <span style="font-size: 0.6em; color: #444; text-transform: uppercase;">Система CBRcats_v1.0</span>
+                </div>
+                
+                <div class="toolbar">
+                    <button class="bb-btn" title="Жирный" onclick="insertBB('[b]', '[/b]')">[B]</button>
+                    <button class="bb-btn" title="Курсив" onclick="insertBB('[i]', '[/i]')">[I]</button>
+                    <button class="bb-btn" title="Подчеркнутый" onclick="insertBB('[u]', '[/u]')">[U]</button>
+                    <button class="bb-btn" title="Зачеркнутый" onclick="insertBB('[s]', '[/s]')">[S]</button>
+                    <button class="bb-btn" title="Картинка" onclick="insertBB('[img]', '[/img]')">[IMG]</button>
+                    <button class="bb-btn colored" title="Красный цвет" onclick="insertBB('[color=red]', '[/color]')">[Красный]</button>
+                    <button class="bb-btn" title="Золотой цвет" onclick="insertBB('[color=gold]', '[/color]')" style="border-color: #444;">[Золотой]</button>
+                </div>
+                
+                <textarea id="edit-about" class="about-area" placeholder="Напиши свою историю выживания..."></textarea>
+                <div style="font-size: 0.65em; color: #444; margin-top: 5px;">
+                    Для вставки картинки выделите прямую ссылку (например: imgbb.co/cat.png) и нажмите [IMG]
                 </div>
             </div>
         </div>
@@ -152,11 +183,11 @@
             <div id="chat-window" class="chat-msgs"></div>
             
             <div id="pm-target-box" style="display:none; margin-bottom: 5px;">
-                <input type="text" id="target-id" placeholder="Введите ID (00.01)" style="width: 150px; font-size: 0.8em;">
+                <input type="text" id="target-id" placeholder="Введите ID кота (00.01)" style="width: 200px; font-size: 0.8em; padding: 8px;">
             </div>
 
             <div style="display:flex; gap: 5px;">
-                <input type="text" id="chat-input" style="flex:1;" placeholder="Написать...">
+                <input type="text" id="chat-input" style="flex:1;" placeholder="Написать сообщение...">
                 <button class="btn" style="width: 100px; padding: 0;" onclick="sendMsg()">ОТПРАВИТЬ</button>
             </div>
         </div>
@@ -193,12 +224,12 @@
             document.querySelectorAll('.btn.locked').forEach(el => el.classList.remove('locked'));
         }
 
-        // Обработка вставки изображений (CTRL+V)
+        // Техническое перехватывание вставки изображений (вывод сообщения)
         document.getElementById('edit-about').addEventListener('paste', function(e) {
             const items = e.clipboardData.items;
             for (let i = 0; i < items.length; i++) {
                 if (items[i].type.indexOf("image") !== -1) {
-                    alert("Изображение перехвачено! Вставьте прямую ссылку в тег [img]ссылка[/img]");
+                    alert("Изображение перехвачено! Выделите ссылку и нажмите [IMG].");
                 }
             }
         });
@@ -216,7 +247,38 @@
         window.location.href = '../index.html';
     }
 
-    // ЛОГИКА ЧАТА
+    // ЛОГИКА ВСТАВКИ BB-КОДОВ (Функция изменена)
+    function insertBB(openTag, closeTag) {
+        const textarea = document.getElementById('edit-about');
+        
+        const start = textarea.selectionStart; // Позиция начала выделения
+        const end = textarea.selectionEnd; // Позиция конца выделения
+        
+        const text = textarea.value; // Весь текст в textarea
+        const selectedText = text.substring(start, end); // Выделенный текст
+        
+        // Формируем новую строку
+        // [Текст_до_выделения][Открывающий_тег][Выделенный_текст][Закрывающий_тег][Текст_после_выделения]
+        const newText = text.substring(0, start) + openTag + selectedText + closeTag + text.substring(end);
+        
+        // Обновляем textarea
+        textarea.value = newText;
+        
+        // Возвращаем фокус на textarea
+        textarea.focus();
+        
+        // Ставим курсор внутрь тегов (если текст не был выделен)
+        // или в конец вставленных тегов (если текст был выделен)
+        if (selectedText) {
+            const newCursorPos = start + openTag.length + selectedText.length + closeTag.length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+        } else {
+            const newCursorPos = start + openTag.length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+        }
+    }
+
+    // ЛОГИКА ЧАТА И ЛС (Оставлена без изменений)
     function openChat(tab) {
         if (!userData.isReady) return alert("Доступно только после выбора окраса!");
         document.getElementById('chat-modal').style.display = 'flex';
