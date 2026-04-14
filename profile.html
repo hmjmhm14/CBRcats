@@ -248,17 +248,33 @@
 
     <div id="modal-chat" class="modal">
         <div class="modal-win">
-            <div class="modal-header"><h2>КАНАЛЫ И ГРУППЫ</h2><button class="bb-btn" onclick="closeModal('chat')">X</button></div>
-            <div class="channel-list" id="chat-channels">
-                <div class="chan-tag active">Общий</div>
-                <div class="chan-tag" onclick="alert('Создание группы...')">+ Новая группа</div>
+            <div class="modal-header"><h2>УПРАВЛЕНИЕ ЧАТАМИ</h2><button class="bb-btn" onclick="closeModal('chat')">X</button></div>
+            
+            <div style="background:#0a0a0a; padding:10px; border:1px solid #222; margin-bottom:10px;">
+                <input type="text" id="new-chat-name" class="settings-input" placeholder="Название чата (напр: Племя)">
+                <select id="new-chat-mode" class="settings-input" style="margin-top:5px;">
+                    <option value="group">Группа (пишут все)</option>
+                    <option value="channel">Канал (пишет только владелец)</option>
+                </select>
+                <button class="select-btn" style="margin-top:10px;" onclick="createNewChat()">СОЗДАТЬ / ОБНОВИТЬ</button>
             </div>
+
             <div class="chat-container" id="global-chat-box"></div>
-            <div style="display:flex; gap:5px; margin-bottom:5px;">
-                <input type="text" id="chat-add-id" class="settings-input" style="width:120px; margin:0" placeholder="+ ID игрока">
-                <input type="text" id="chat-input" class="settings-input" style="margin:0" placeholder="Ваше сообщение...">
+
+            <div id="chat-admin-panel" style="display:none; border-top:1px solid #333; padding-top:10px; margin-top:10px;">
+                <p style="font-size:0.7em; color:#ffcc00; margin:0 0 5px 0;">ПАНЕЛЬ ВЛАДЕЛЬЦА:</p>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="chat-user-target" class="settings-input" style="width:100px; margin:0" placeholder="ID игрока">
+                    <button class="bb-btn" onclick="manageChatAction('transfer')">ПРАВА</button>
+                    <button class="bb-btn" onclick="manageChatAction('kick')">КИК</button>
+                    <button class="bb-btn" style="color:#ff3333" onclick="manageChatAction('delete')">УДАЛИТЬ</button>
+                </div>
             </div>
-            <button class="select-btn" onclick="sendChatMessage()">ОТПРАВИТЬ</button>
+
+            <div id="chat-input-zone" style="display:flex; gap:5px; margin-top:10px;">
+                <input type="text" id="chat-input" class="settings-input" placeholder="Сообщение...">
+                <button class="bb-btn" onclick="sendChatMessage()">></button>
+            </div>
         </div>
     </div>
 
@@ -266,17 +282,16 @@
         <div class="modal-win">
             <div class="modal-header"><h2>ЛИЧНЫЕ СООБЩЕНИЯ</h2><button class="bb-btn" onclick="closeModal('pm')">X</button></div>
             <div class="pm-tabs">
-                <div class="pm-tab active" onclick="switchPMTab('inbox', this)">ПОЛУЧАТЕЛЬ</div>
-                <div class="pm-tab" onclick="switchPMTab('sent', this)">ОТПРАВИТЕЛЬ</div>
+                <div class="pm-tab active" onclick="filterPM('inbox', this)">ПОЛУЧАТЕЛЬ (Входящие)</div>
+                <div class="pm-tab" onclick="filterPM('sent', this)">ОТПРАВИТЕЛЬ (Исходящие)</div>
             </div>
-            <div id="pm-write-zone">
-                <input type="text" id="pm-target-id" class="settings-input" placeholder="ID получателя (напр: 00.01)">
-                <div class="toolbar" style="margin-top:10px;">
-                    <button class="bb-btn" onclick="insertBB('pm-text', '[b]', '[/b]')">B</button>
-                    <button class="bb-btn" onclick="insertBB('pm-text', '[img]', '[/img]')">IMG</button>
-                </div>
-                <textarea id="pm-text" class="about-area" style="height:100px;"></textarea>
-                <button class="select-btn" style="margin-top:10px;" onclick="alert('Отправлено игроку ' + document.getElementById('pm-target-id').value)">ОТПРАВИТЬ</button>
+            <div id="pm-viewer" style="height:150px; overflow-y:auto; background:#050505; border:1px solid #222; padding:10px; font-size:0.85em;">
+                Выберите вкладку для просмотра...
+            </div>
+            <div style="margin-top:10px;">
+                <input type="text" id="pm-target-id" class="settings-input" placeholder="ID получателя">
+                <textarea id="pm-text-content" class="about-area" style="height:60px; margin-top:5px;" placeholder="Ваше сообщение..."></textarea>
+                <button class="select-btn" onclick="sendPrivateMessage()">ОТПРАВИТЬ</button>
             </div>
         </div>
     </div>
@@ -452,21 +467,69 @@
         }
 
         function saveAboutData() {
+            // Проверка смены фракции для чатов
+            if (activeChat && activeChat.tribe !== userData.tribe) {
+                document.getElementById('global-chat-box').innerHTML = "<div style='color:red; font-size:0.7em;'>Вы покинули фракцию. Доступ к чату закрыт.</div>";
+                document.getElementById('chat-owner-panel').style.display = 'none';
+            }
+
             userData.about = document.getElementById('edit-about').value;
             localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
             alert("История сохранена!");
         }
 
-        function saveSettings() {
+       function saveSettings() {
             userData.email = document.getElementById('set-email').value;
-            userData.password = document.getElementById('set-pass').value;
+            userData.password = document.getElementById('set-pass').value; // Сохраняем пароль
             localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
-            alert("Аккаунт обновлен!");
+            alert("Данные аккаунта (почта и пароль) успешно обновлены!");
+            closeModal('settings');
         }
 
         function openModal(m) { document.getElementById('modal-' + m).style.display = 'flex'; }
         function closeModal(m) { document.getElementById('modal-' + m).style.display = 'none'; }
         function exitWithoutSave() { window.location.href = 'index.html'; }
+
+        // --- НОВЫЕ ФУНКЦИИ УПРАВЛЕНИЯ ---
+        let activeChat = { owner: null, type: 'group', tribe: 'Одиночки' };
+
+        function initChat() {
+            const title = document.getElementById('new-chat-name').value;
+            const mode = document.getElementById('new-chat-mode').value;
+            if(!title) return alert("Введите название!");
+
+            activeChat = { title: title, type: mode, owner: userData.id, tribe: userData.tribe };
+            document.getElementById('global-chat-box').innerHTML = `<div style="color:#ffcc00; text-align:center; font-size:0.7em;">--- ${mode === 'group' ? 'ГРУППА' : 'КАНАЛ'}: ${title} ---</div>`;
+            document.getElementById('chat-owner-panel').style.display = 'block';
+        }
+
+        function chatAdminAction(act) {
+            const target = document.getElementById('chat-admin-target').value;
+            if(act === 'delete') {
+                document.getElementById('global-chat-box').innerHTML = "";
+                document.getElementById('chat-owner-panel').style.display = 'none';
+                activeChat.owner = null;
+            } else if(act === 'transfer') {
+                if(!target) return alert("Введите ID игрока");
+                activeChat.owner = target;
+                alert("Права переданы ID " + target);
+                document.getElementById('chat-owner-panel').style.display = 'none';
+            } else if(act === 'kick') {
+                alert("Игрок " + target + " исключен.");
+            }
+        }
+
+        // Фильтр ЛС по ID (Получатель читает только свои)
+        function loadPMs(tab, el) {
+            document.querySelectorAll('.pm-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            const box = document.getElementById('pm-display-list');
+            if(tab === 'inbox') {
+                box.innerHTML = `<div style="color:#4caf50">Входящие для ${userData.id}:</div><div class="chat-msg">Привет от системы!</div>`;
+            } else {
+                box.innerHTML = `<div style="color:#888">Ваши исходящие...</div>`;
+            }
+        }
     </script>
 </body>
 </html>
