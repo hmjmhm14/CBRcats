@@ -7,13 +7,12 @@
 <body>
     <script>
         /**
-         * CBRcats ENGINE v1.3 — Регистрация с учетом созданных племен
+         * CBRcats ENGINE v1.5 — Полная интеграция систем
          */
-
         const CONFIG = {
             storageKey: 'cbrcat_user_data',
             counterKey: 'cbrcat_id_counter',
-            tribesKey: 'cbrcat_tribes_list', // Ключ для хранения списка всех племен
+            tribesKey: 'cbrcat_tribes_list',
             defaultAvatar: 'https://i.ibb.co/V09zmWcT/image.png'
         };
 
@@ -23,16 +22,14 @@
             return `${main}.${sub}`;
         }
 
-        /**
-         * Инициализация системы
-         */
         function initCBRSystem() {
             try {
                 let userData = localStorage.getItem(CONFIG.storageKey);
                 let idCounter = localStorage.getItem(CONFIG.counterKey);
-                
-                // Получаем список созданных племен из памяти
-                let existingTribes = JSON.parse(localStorage.getItem(CONFIG.tribesKey)) || [];
+                // Загружаем список племен или создаем дефолтных Одиночек
+                let existingTribes = JSON.parse(localStorage.getItem(CONFIG.tribesKey)) || [
+                    { name: "Одиночки", smell: "Запах пыли", smellIcon: "", spawnCoords: "0,0" }
+                ];
 
                 if (idCounter === null) {
                     localStorage.setItem(CONFIG.counterKey, "0");
@@ -41,16 +38,9 @@
 
                 if (!userData) {
                     let currentCount = parseInt(idCounter);
-                    let newID = formatPlayerID(currentCount);
-                    
-                    // По умолчанию "Одиночки", но если есть созданные племена — берем первое из списка
-                    let startTribe = "Одиночки";
-                    let startSmell = "Запах пыли и свободы";
-
-                    if (existingTribes.length > 0) {
-                        startTribe = existingTribes[0].name;
-                        startSmell = existingTribes[0].smell;
-                    }
+                    // Разработчик всегда получает 00.00
+                    let newID = currentCount === 0 ? "00.00" : formatPlayerID(currentCount);
+                    let startTribe = existingTribes[0];
 
                     const newProfile = {
                         id: newID,
@@ -58,9 +48,11 @@
                         email: "",
                         password: "",
                         appearance: CONFIG.defaultAvatar,
-                        tribe: startTribe, // Подставляет созданное племя
-                        smell: startSmell, // Подставляет запах этого племени
-                        gender: "кот",
+                        tribe: startTribe.name, //
+                        smell: startTribe.smell, //
+                        smellIcon: startTribe.smellIcon, //
+                        spawnPoint: startTribe.spawnCoords, //
+                        gender: "кот", //
                         birthday: new Date().toLocaleDateString(),
                         about: "История выживания...",
                         status: currentCount === 0 ? "admin" : "player"
@@ -68,35 +60,18 @@
 
                     localStorage.setItem(CONFIG.storageKey, JSON.stringify(newProfile));
                     localStorage.setItem(CONFIG.counterKey, (currentCount + 1).toString());
-                    console.log("CBRcats: Профиль создан с привязкой к: " + startTribe);
                 }
-            } catch (e) {
-                console.error("Ошибка системы:", e);
-            }
+            } catch (e) { console.error(e); }
         }
 
-        /**
-         * Функция для панели управления: Создать новое племя в общий список
-         */
-        function adminCreateTribe(name, smell) {
-            let tribes = JSON.parse(localStorage.getItem(CONFIG.tribesKey)) || [];
-            // Проверяем, нет ли уже такого племени
-            tribes = tribes.filter(t => t.name !== name); 
-            tribes.push({ name: name, smell: smell });
-            localStorage.setItem(CONFIG.tribesKey, JSON.stringify(tribes));
-        }
-
-        /**
-         * Функция для панели управления: Удалить племя
-         */
-        function adminDeleteTribe(name) {
-            let tribes = JSON.parse(localStorage.getItem(CONFIG.tribesKey)) || [];
-            tribes = tribes.filter(t => t.name !== name);
-            localStorage.setItem(CONFIG.tribesKey, JSON.stringify(tribes));
-        }
-
-        function getCBRData() {
-            return JSON.parse(localStorage.getItem(CONFIG.storageKey));
+        // Парсер BB-кодов для отображения
+        function parseBBCode(text) {
+            if (!text) return "";
+            return text
+                .replace(/\[b\](.*?)\[\/b\]/gi, '<b>$1</b>')
+                .replace(/\[i\](.*?)\[\/i\]/gi, '<i>$1</i>')
+                .replace(/\[url\](.*?)\[\/url\]/gi, '<a href="$1" target="_blank">$1</a>')
+                .replace(/\[img\](.*?)\[\/img\]/gi, '<img src="$1" style="max-width:100%;">');
         }
 
         initCBRSystem();
