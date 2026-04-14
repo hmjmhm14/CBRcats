@@ -13,7 +13,6 @@
             min-height: 100vh;
         }
 
-        /* Кроваво-красный хедер с полоской */
         header {
             width: 100%;
             background: linear-gradient(to bottom, #1a0000, #050505);
@@ -39,7 +38,6 @@
             flex-wrap: wrap;
         }
 
-        /* Блок "Об игре" — восстановлен */
         .info-box {
             max-width: 400px;
             background: rgba(20, 20, 20, 0.8);
@@ -64,7 +62,6 @@
             border-radius: 3px;
         }
 
-        /* Контейнер авторизации в красном стиле */
         .auth-card {
             width: 380px;
             background: #000;
@@ -147,7 +144,6 @@
             background: #cc0000;
             letter-spacing: 1px;
         }
-
     </style>
 </head>
 <body>
@@ -157,12 +153,11 @@
     </header>
 
     <div class="main-content">
-        
         <section class="info-box">
             <h2>О проекте <span class="beta-badge">бета-тестер</span></h2>
             <p>Жизнь на выживание...</p>
             <p>Посмотрим, сможешь ли ты выжить среди страшных и мутированных зомби или придется тебе вступить в фракции, чтобы не умереть одному?</p>
-            <p style="color: #666; font-size: 0.8em; margin-top: 20px;">[СИСТЕМА: CBRcats_v0.0]</p>
+            <p style="color: #666; font-size: 0.8em; margin-top: 20px;">[СИСТЕМА: CBRcats_v1.0.144]</p>
         </section>
 
         <div class="auth-card">
@@ -171,33 +166,27 @@
                     <div class="tab active" id="tab-login" onclick="setMode(true)">Вход</div>
                     <div class="tab" id="tab-reg" onclick="setMode(false)">Регистрация</div>
                 </div>
-
                 <div class="input-field">
                     <label>Почта выжившего</label>
                     <input type="email" id="email" placeholder="email@cbrcats.com">
                 </div>
-
                 <div class="input-field">
                     <label>Ключ доступа (пароль)</label>
                     <input type="password" id="pass" placeholder="••••••••">
                 </div>
-
                 <button class="action-btn" id="submit-btn" onclick="handleStep1()">ПРОДОЛЖИТЬ</button>
             </div>
 
             <div id="step-2" style="display: none;">
                 <h2 style="color: #ffcc00; font-size: 1em; text-align: center; text-transform: uppercase;">Создание персонажа</h2>
-                
                 <div class="input-field">
                     <label>Вселенная</label>
                     <div class="universe-static">Хранители Леса</div>
                 </div>
-
                 <div class="input-field">
                     <label>Имя кота / кошки</label>
                     <input type="text" id="cat-name" placeholder="Введите имя">
                 </div>
-
                 <div class="input-field">
                     <label>Пол</label>
                     <select id="cat-gender">
@@ -205,12 +194,10 @@
                         <option value="кошка">Кошка</option>
                     </select>
                 </div>
-
                 <div class="input-field">
                     <label>Статус</label>
                     <div class="universe-static" style="color: #888;">Одиночки</div>
                 </div>
-
                 <button class="action-btn" onclick="finishRegistration()">ЗАВЕРШИТЬ СОЗДАНИЕ</button>
             </div>
         </div>
@@ -230,13 +217,12 @@
         function handleStep1() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
-
             if (!email || !pass) return alert("Заполните данные!");
 
             if (isLogin) {
-                const data = JSON.parse(localStorage.getItem('cbrcat_user_data'));
-                if (data && data.email === email && data.password === pass) {
-                    window.location.href = 'Профиль/profile.html';
+                const savedData = JSON.parse(localStorage.getItem('cbrcat_user_data'));
+                if (savedData && savedData.email === email && savedData.password === pass) {
+                    window.location.href = 'profile.html';
                 } else {
                     alert("Ошибка: Личность не подтверждена.");
                 }
@@ -250,10 +236,11 @@
         function finishRegistration() {
             const name = document.getElementById('cat-name').value;
             const gender = document.getElementById('cat-gender').value;
-
             if (!name) return alert("Введите имя персонажа!");
 
-            let count = parseInt(localStorage.getItem('cbrcat_id_counter') || "144");
+            // ИЗМЕНЕНО: Отсчет начинается с 0, чтобы получить 00.00
+            let count = parseInt(localStorage.getItem('cbrcat_id_counter') || "0");
+            
             let main = Math.floor(count / 100).toString().padStart(2, '0');
             let sub = (count % 100).toString().padStart(2, '0');
             let newID = `${main}.${sub}`;
@@ -273,8 +260,8 @@
             localStorage.setItem('cbrcat_user_data', JSON.stringify(profile));
             localStorage.setItem('cbrcat_id_counter', (count + 1).toString());
 
-            alert("Профиль создан. Ваш ID: " + newID);
-            window.location.href = 'Профиль/profile.html';
+            alert("Профиль создан! Ваш ID: " + newID);
+            window.location.href = 'profile.html'; 
         }
     </script>
 </body>
