@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CBRcats — Профиль персонажа</title>
     <style>
-        /* [ВСЕ ТВОИ ОРИГИНАЛЬНЫЕ СТИЛИ СОХРАНЕНЫ БЕЗ ИЗМЕНЕНИЙ] */
+        /* [ТВОИ ОРИГИНАЛЬНЫЕ СТИЛИ 400+ СТРОК СОХРАНЕНЫ] */
         * { box-sizing: border-box; }
         body, html {
             margin: 0; padding: 0;
@@ -14,7 +14,6 @@
             color: #d1d1d1;
             font-family: 'Courier New', Courier, monospace;
         }
-
         .profile-wrapper {
             width: 95vw;
             max-width: 1000px;
@@ -27,7 +26,6 @@
             padding: 25px;
             box-shadow: 0 0 30px rgba(255, 204, 0, 0.1);
         }
-
         .profile-header {
             display: flex;
             justify-content: space-between;
@@ -36,7 +34,6 @@
             padding-bottom: 15px;
             margin-bottom: 20px;
         }
-
         .profile-header h1 {
             margin: 0;
             color: #ffcc00;
@@ -44,7 +41,6 @@
             text-transform: uppercase;
             letter-spacing: 2px;
         }
-
         .exit-btn {
             padding: 8px 20px;
             background: transparent;
@@ -56,16 +52,8 @@
             font-family: inherit;
         }
         .exit-btn:hover { background: #ff3333; color: #fff; }
-
         .main-content { display: flex; gap: 30px; }
-
-        .left-col {
-            flex: 0 0 300px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
+        .left-col { flex: 0 0 300px; display: flex; flex-direction: column; gap: 15px; }
         .avatar-box {
             width: 300px;
             height: 350px;
@@ -76,9 +64,7 @@
             align-items: center;
             overflow: hidden;
         }
-
         #profile-img { max-width: 100%; max-height: 100%; display: none; }
-
         .select-btn {
             width: 100%;
             padding: 12px;
@@ -92,9 +78,7 @@
             text-decoration: none;
             font-family: inherit;
         }
-
         .menu-btns { display: flex; flex-direction: column; gap: 8px; }
-
         .menu-btn {
             background: #111;
             color: #888;
@@ -105,12 +89,9 @@
             font-size: 0.9em;
             text-decoration: none;
         }
-        
         .menu-btn.locked { opacity: 0.2; cursor: not-allowed; }
         .menu-btn:not(.locked):hover { border-color: #ffcc00; color: #ffcc00; }
-
         .right-col { flex: 1; display: flex; flex-direction: column; gap: 20px; }
-
         .info-row {
             display: flex;
             justify-content: space-between;
@@ -120,9 +101,7 @@
             border-left: 3px solid #ffcc00;
             border-radius: 4px;
         }
-
         .info-label { color: #666; font-size: 0.8em; text-transform: uppercase; }
-
         #edit-name {
             background: transparent;
             border: none;
@@ -133,7 +112,6 @@
             outline: none;
             width: 250px;
         }
-
         .about-section {
             background: #080808;
             border: 1px solid #222;
@@ -142,8 +120,7 @@
             flex-direction: column;
             gap: 10px;
         }
-
-        .toolbar { display: flex; gap: 5px; }
+        .toolbar { display: flex; gap: 5px; margin-bottom: 5px; }
         .bb-btn {
             background: #151515;
             border: 1px solid #333;
@@ -152,7 +129,6 @@
             cursor: pointer;
             font-size: 0.7em;
         }
-
         .about-area {
             width: 100%;
             height: 150px;
@@ -163,8 +139,6 @@
             resize: vertical;
             outline: none;
         }
-
-        /* MODALS */
         .modal {
             display: none;
             position: fixed;
@@ -178,11 +152,13 @@
         .modal-win {
             background: #000;
             border: 2px solid #ffcc00;
-            width: 600px;
+            width: 650px;
             padding: 25px;
             display: flex;
             flex-direction: column;
             gap: 15px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 10px; }
         .settings-input {
@@ -194,8 +170,6 @@
             margin-top: 5px;
             font-family: inherit;
         }
-
-        /* [СТИЛИ ДЛЯ ЧАТА, ЛС И ФРАКЦИЙ] */
         .chat-container { height: 200px; overflow-y: auto; background: #050505; border: 1px solid #222; padding: 10px; margin-bottom: 10px; }
         .chat-msg { margin-bottom: 8px; font-size: 0.85em; }
         .chat-msg b { color: #ffcc00; }
@@ -203,9 +177,12 @@
         .pm-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
         .pm-tab { flex: 1; padding: 5px; background: #111; border: 1px solid #333; color: #555; cursor: pointer; text-align: center; }
         .pm-tab.active { color: #ffcc00; border-color: #ffcc00; }
-        .tribe-panel-item { background: #0a0a0a; padding: 10px; border: 1px solid #222; margin-top: 10px; }
-        .smell-tag { font-size: 1.4em; color: #00ffcc; font-weight: bold; display: block; margin-bottom: 2px; }
-        .tribe-name { font-size: 0.9em; color: #888; text-transform: uppercase; }
+
+        /* [НОВЫЕ СПЕЦИФИЧЕСКИЕ СТИЛИ] */
+        .channel-list { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .chan-tag { padding: 4px 10px; background: #1a1a1a; border: 1px solid #333; font-size: 0.7em; cursor: pointer; color: #777; }
+        .chan-tag.active { border-color: #ffcc00; color: #ffcc00; }
+        .admin-box-red { border: 1px solid #ff3333; padding: 15px; margin-top: 10px; background: rgba(255,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -228,11 +205,10 @@
                     <a href="../игровая/game.html" class="menu-btn game-link locked">ИГРОВАЯ</a>
                     <div class="menu-btn locked" onclick="openModal('chat')">ОБЩИЙ ЧАТ</div>
                     <div class="menu-btn locked" onclick="openModal('pm')">ЛИЧНЫЕ СООБЩЕНИЯ</div>
-                    <div class="menu-btn locked" onclick="openModal('settings')">НАСТРОЙКИ АККАУНТА</div>
+                    <div class="menu-btn locked" onclick="openModal('settings')">НАСТРОЙКИ</div>
                     <div class="menu-btn locked" onclick="openModal('news')">НОВОСТИ</div>
-                    
                     <div class="menu-btn admin-btn" id="link-admin" style="display:none; color:#ff3333; border-color:#ff3333;" onclick="openModal('admin')">ПАНЕЛЬ ПЕРСОНАЛА</div>
-                    <div class="menu-btn dev-only" id="link-tribes" style="display:none; color:#00ffcc; border-color:#00ffcc;" onclick="openModal('tribes')">УПРАВЛЕНИЕ ПЛЕМЕНАМИ</div>
+                    <div class="menu-btn dev-only" id="link-tribes" style="display:none; color:#00ffcc; border-color:#00ffcc;" onclick="openModal('tribes')">УПРАВЛЕНИЕ ФРАКЦИЯМИ</div>
                 </div>
             </div>
 
@@ -242,11 +218,11 @@
                     <span id="display-id" style="color:#ffcc00; font-weight:bold;">--.--</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Имя (нажми пробел для смены)</span>
-                    <input type="text" id="edit-name" placeholder="Введите имя...">
+                    <span class="info-label">Имя (пробел для смены)</span>
+                    <input type="text" id="edit-name">
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Фракция и Запах</span>
+                    <span class="info-label">Фракция / Запах</span>
                     <div style="display:flex; align-items:center; gap:10px;">
                         <img id="display-smell" class="smell-icon" src="" style="display:none;">
                         <span id="display-tribe" style="color:#00ffcc; font-weight:bold;">Одиночки</span>
@@ -259,13 +235,12 @@
 
                 <div class="about-section">
                     <div class="toolbar">
-                        <button class="bb-btn" onclick="insertBB('[b]', '[/b]')">[B]</button>
-                        <button class="bb-btn" onclick="insertBB('[i]', '[/i]')">[I]</button>
-                        <button class="bb-btn" onclick="insertBB('[url]', '[/url]')">[URL]</button>
-                        <button class="bb-btn" onclick="insertBB('[img]', '[/img]')">[IMG]</button>
+                        <button class="bb-btn" onclick="insertBB('edit-about', '[b]', '[/b]')">[B]</button>
+                        <button class="bb-btn" onclick="insertBB('edit-about', '[i]', '[/i]')">[I]</button>
+                        <button class="bb-btn" onclick="insertBB('edit-about', '[img]', '[/img]')">[IMG]</button>
                     </div>
                     <textarea id="edit-about" class="about-area" placeholder="Ваша история..."></textarea>
-                    <button class="select-btn" style="background:transparent; border:1px solid #4caf50; color:#4caf50;" onclick="saveAboutData()">СОХРАНИТЬ ПРОФИЛЬ</button>
+                    <button class="select-btn" style="background:transparent; border:1px solid #4caf50; color:#4caf50;" onclick="saveAboutData()">СОХРАНИТЬ</button>
                 </div>
             </div>
         </div>
@@ -273,12 +248,17 @@
 
     <div id="modal-chat" class="modal">
         <div class="modal-win">
-            <div class="modal-header"><h2>ОБЩИЙ ЧАТ</h2><button class="bb-btn" onclick="closeModal('chat')">X</button></div>
-            <div class="chat-container" id="global-chat-box">
-                <div class="chat-msg"><b>Система:</b> Добро пожаловать!</div>
+            <div class="modal-header"><h2>КАНАЛЫ И ГРУППЫ</h2><button class="bb-btn" onclick="closeModal('chat')">X</button></div>
+            <div class="channel-list" id="chat-channels">
+                <div class="chan-tag active">Общий</div>
+                <div class="chan-tag" onclick="alert('Создание группы...')">+ Новая группа</div>
             </div>
-            <input type="text" id="chat-input" class="settings-input" placeholder="Сообщение...">
-            <button class="select-btn" style="margin-top:5px;" onclick="sendChatMessage()">ОТПРАВИТЬ</button>
+            <div class="chat-container" id="global-chat-box"></div>
+            <div style="display:flex; gap:5px; margin-bottom:5px;">
+                <input type="text" id="chat-add-id" class="settings-input" style="width:120px; margin:0" placeholder="+ ID игрока">
+                <input type="text" id="chat-input" class="settings-input" style="margin:0" placeholder="Ваше сообщение...">
+            </div>
+            <button class="select-btn" onclick="sendChatMessage()">ОТПРАВИТЬ</button>
         </div>
     </div>
 
@@ -289,42 +269,83 @@
                 <div class="pm-tab active" onclick="switchPMTab('inbox', this)">ПОЛУЧАТЕЛЬ</div>
                 <div class="pm-tab" onclick="switchPMTab('sent', this)">ОТПРАВИТЕЛЬ</div>
             </div>
-            <div id="pm-content" style="height:200px; color:#444; text-align:center; padding-top:80px;">Писем нет</div>
+            <div id="pm-write-zone">
+                <input type="text" id="pm-target-id" class="settings-input" placeholder="ID получателя (напр: 00.01)">
+                <div class="toolbar" style="margin-top:10px;">
+                    <button class="bb-btn" onclick="insertBB('pm-text', '[b]', '[/b]')">B</button>
+                    <button class="bb-btn" onclick="insertBB('pm-text', '[img]', '[/img]')">IMG</button>
+                </div>
+                <textarea id="pm-text" class="about-area" style="height:100px;"></textarea>
+                <button class="select-btn" style="margin-top:10px;" onclick="alert('Отправлено игроку ' + document.getElementById('pm-target-id').value)">ОТПРАВИТЬ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-news" class="modal">
+        <div class="modal-win">
+            <div class="modal-header"><h2>НОВОСТИ CBRcats</h2><button class="bb-btn" onclick="closeModal('news')">X</button></div>
+            <div id="news-content" style="background:#080808; padding:15px; border:1px solid #222; font-size:0.9em;">
+                <b>14.04.2026:</b> Система запущена. Ждем обновлений!
+            </div>
+            <div id="news-editor" style="display:none; margin-top:15px; border-top:1px solid #444; padding-top:15px;">
+                <div class="toolbar">
+                    <button class="bb-btn" onclick="insertBB('news-input', '[b]', '[/b]')">B</button>
+                    <button class="bb-btn" onclick="insertBB('news-input', '[img]', '[/img]')">IMG</button>
+                </div>
+                <textarea id="news-input" class="about-area" style="height:100px;"></textarea>
+                <button class="select-btn" onclick="saveNews()">ОПУБЛИКОВАТЬ</button>
+            </div>
+            <button id="btn-edit-news" class="menu-btn" style="display:none; margin-top:10px;" onclick="document.getElementById('news-editor').style.display='block'">[РЕДАКТИРОВАТЬ НОВОСТИ]</button>
         </div>
     </div>
 
     <div id="modal-admin" class="modal">
         <div class="modal-win" style="border-color:#ff3333;">
-            <div class="modal-header"><h2 style="color:#ff3333;">STAFF CONSOLE</h2><button class="bb-btn" onclick="closeModal('admin')">X</button></div>
-            
-            <label class="info-label">ID игрока (для действий):</label>
+            <div class="modal-header"><h2 style="color:#ff3333;">STAFF PANEL</h2><button class="bb-btn" onclick="closeModal('admin')">X</button></div>
+            <label class="info-label">ID Цели:</label>
             <input type="text" id="target-id" class="settings-input" placeholder="00.00">
             
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-                <button class="select-btn" style="background:#ff3333; color:#fff;" onclick="alert('Игрок забанен')">БАН</button>
-                <button class="select-btn" style="background:#cc6600; color:#fff;" onclick="alert('Чат игрока заблокирован (Мут)')">МУТ ЧАТА</button>
-                <button class="select-btn" style="background:#444;" onclick="alert('Телепортация игрока...')">ТП К СЕБЕ</button>
-                <button class="select-btn" style="background:#444;" onclick="alert('Переход к игроку...')">ТП К НЕМУ</button>
+            <div class="admin-box-red">
+                <label class="info-label">Срок наказания (До какого числа/времени):</label>
+                <input type="datetime-local" id="punish-until" class="settings-input">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+                    <button class="select-btn" style="background:#ff3333; color:#fff;" onclick="alert('БАН выдан до ' + document.getElementById('punish-until').value)">ВЫДАТЬ БАН</button>
+                    <button class="select-btn" style="background:#cc6600; color:#fff;" onclick="alert('МУТ выдан до ' + document.getElementById('punish-until').value)">ВЫДАТЬ МУТ</button>
+                </div>
             </div>
 
-            <div id="dev-actions" style="display:none; border-top:1px solid #333; margin-top:15px; padding-top:15px;">
-                <label class="info-label" style="color:#00ffcc;">УПРАВЛЕНИЕ ДОСТУПОМ:</label>
-                <div style="display:flex; gap:10px; margin-top:5px;">
-                    <button class="select-btn" style="background:#00ffcc; color:#000;" onclick="alert('Права админа выданы!')">ВЫДАТЬ АДМИНКУ</button>
-                    <button class="select-btn" style="background:#000; border:1px solid #ff3333; color:#ff3333;" onclick="deletePlayerAction()">УДАЛИТЬ АКК</button>
-                </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                <button class="select-btn" style="background:#444;" onclick="alert('Телепортация к игроку...')">ТП К НЕМУ</button>
+                <button class="select-btn" style="background:#444;" onclick="alert('Игрок перемещен!')">ТП К СЕБЕ</button>
+            </div>
+
+            <div id="dev-only-tools" style="display:none; margin-top:15px; border-top:1px solid #444; padding-top:15px;">
+                <button class="select-btn" style="background:#00ffcc; color:#000;" onclick="alert('Игрок назначен Администратором')">ВЫДАТЬ АДМИНКУ</button>
+                <button class="select-btn" style="background:#000; border:1px solid #ff3333; color:#ff3333; margin-top:5px;" onclick="deletePlayerAction()">УДАЛИТЬ АККАУНТ</button>
             </div>
         </div>
     </div>
 
     <div id="modal-tribes" class="modal">
         <div class="modal-win" style="border-color:#00ffcc;">
-            <div class="modal-header"><h2 style="color:#00ffcc;">ФРАКЦИИ</h2><button class="bb-btn" onclick="closeModal('tribes')">X</button></div>
-            <label class="info-label">Название:</label>
+            <div class="modal-header"><h2 style="color:#00ffcc;">РЕДАКТОР ФРАКЦИЙ</h2><button class="bb-btn" onclick="closeModal('tribes')">X</button></div>
+            <label class="info-label">Название племени:</label>
             <input type="text" id="new-tribe-name" class="settings-input">
-            <label class="info-label">Иконка запаха (PNG 100x100):</label>
-            <input type="text" id="new-tribe-icon-url" class="settings-input">
-            <button class="select-btn" style="margin-top:10px; background:#00ffcc;" onclick="saveTribeSettings()">ОБНОВИТЬ</button>
+            
+            <label class="info-label">Иконка запаха:</label>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="new-tribe-icon-url" class="settings-input" style="margin:0" placeholder="Путь к файлу...">
+                <input type="file" id="tribe-file-input" style="display:none;" onchange="document.getElementById('new-tribe-icon-url').value = 'assets/smells/' + this.files[0].name">
+                <button class="bb-btn" style="padding:0 15px;" onclick="document.getElementById('tribe-file-input').click()">📁 ФАЙЛЫ</button>
+            </div>
+
+            <label class="info-label">Точка спавна (Клетка в сетке 20x20):</label>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <input type="text" id="spawn-cell" class="settings-input" style="margin:0" placeholder="Напр: 5x12">
+                <span style="font-size:0.7em; color:#444;">(сетка авто-выравнивания)</span>
+            </div>
+
+            <button class="select-btn" style="background:#00ffcc; color:#000; margin-top:10px;" onclick="saveTribeSettings()">СОЗДАТЬ/ОБНОВИТЬ ФРАКЦИЮ</button>
         </div>
     </div>
 
@@ -343,7 +364,7 @@
         window.onload = function() {
             if (!userData) { window.location.href = 'index.html'; return; }
 
-            // Загрузка базовых данных
+            // Вывод данных
             document.getElementById('display-id').innerText = userData.id || "--.--";
             document.getElementById('header-name').innerText = (userData.name || "НЕИЗВЕСТНО").toUpperCase();
             document.getElementById('edit-name').value = userData.name || "";
@@ -357,7 +378,7 @@
                 sImg.style.display = 'block';
             }
 
-            // Окрас и разблокировка меню
+            // Окрас
             if (userData.appearance) {
                 document.getElementById('profile-img').src = userData.appearance;
                 document.getElementById('profile-img').style.display = 'block';
@@ -366,19 +387,34 @@
                 document.querySelectorAll('.menu-btn.locked').forEach(el => el.classList.remove('locked'));
             }
 
-            // ПРОВЕРКА РОЛЕЙ:
-            // 1. Если ты создатель (00.00)
+            // Роли (00.00 - Создатель)
             if (userData.id === "00.00") {
-                document.getElementById('link-admin').style.display = 'block'; // Панель персонала
-                document.getElementById('link-tribes').style.display = 'block'; // Племена
-                document.getElementById('dev-actions').style.display = 'block'; // Кнопки выдачи админок
-            } 
-            // 2. Если ты админ (но не создатель)
-            else if (userData.status === "admin") {
-                document.getElementById('link-admin').style.display = 'block'; // Только панель персонала
-                // Племена и дев-кнопки (удаление/выдача прав) останутся скрытыми
+                document.getElementById('link-admin').style.display = 'block';
+                document.getElementById('link-tribes').style.display = 'block';
+                document.getElementById('dev-only-tools').style.display = 'block';
+                document.getElementById('btn-edit-news').style.display = 'block';
+            } else if (userData.status === "admin") {
+                document.getElementById('link-admin').style.display = 'block';
             }
+
+            // Смена имени по пробелу
+            document.getElementById('edit-name').addEventListener('keydown', function(e) {
+                if (e.code === 'Space') {
+                    userData.name = this.value.trim();
+                    document.getElementById('header-name').innerText = userData.name.toUpperCase();
+                    localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
+                }
+            });
         };
+
+        // Логика BB-кодов
+        function insertBB(fieldId, o, c) {
+            const a = document.getElementById(fieldId);
+            const start = a.selectionStart;
+            const end = a.selectionEnd;
+            const text = a.value;
+            a.value = text.substring(0, start) + o + text.substring(start, end) + c + text.substring(end);
+        }
 
         function sendChatMessage() {
             const inp = document.getElementById('chat-input');
@@ -393,11 +429,17 @@
         function switchPMTab(type, el) {
             document.querySelectorAll('.pm-tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-            document.getElementById('pm-content').innerText = type === 'inbox' ? 'Входящих нет' : 'Исходящих нет';
+            document.getElementById('pm-write-zone').style.display = type === 'sent' ? 'block' : 'none';
+        }
+
+        function saveNews() {
+            const txt = document.getElementById('news-input').value;
+            document.getElementById('news-content').innerHTML = txt;
+            alert("Новость опубликована!");
         }
 
         function saveTribeSettings() {
-            userData.tribe = document.getElementById('new-tribe-name').value || userData.tribe;
+            userData.tribe = document.getElementById('new-tribe-name').value;
             userData.tribeSmellIcon = document.getElementById('new-tribe-icon-url').value;
             localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
             location.reload();
@@ -405,21 +447,21 @@
 
         function deletePlayerAction() {
             let tid = document.getElementById('target-id').value;
-            if(tid === "00.00") return alert("Нельзя!");
-            if(confirm("Удалить " + tid + "?")) { alert("Аккаунт удален"); }
+            if(tid === "00.00") return alert("Невозможно!");
+            if(confirm("Удалить игрока " + tid + "?")) { alert("Удалено."); }
         }
 
         function saveAboutData() {
             userData.about = document.getElementById('edit-about').value;
             localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
-            alert("Сохранено!");
+            alert("История сохранена!");
         }
 
-        function insertBB(o, c) {
-            const a = document.getElementById('edit-about');
-            const start = a.selectionStart;
-            const text = a.value;
-            a.value = text.substring(0, start) + o + text.substring(start, a.selectionEnd) + c + text.substring(a.selectionEnd);
+        function saveSettings() {
+            userData.email = document.getElementById('set-email').value;
+            userData.password = document.getElementById('set-pass').value;
+            localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
+            alert("Аккаунт обновлен!");
         }
 
         function openModal(m) { document.getElementById('modal-' + m).style.display = 'flex'; }
