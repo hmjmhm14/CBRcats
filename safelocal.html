@@ -6,13 +6,9 @@
 </head>
 <body>
     <script>
-        /**
-         * CBRcats ENGINE v1.5 — Полная интеграция систем
-         */
         const CONFIG = {
             storageKey: 'cbrcat_user_data',
             counterKey: 'cbrcat_id_counter',
-            tribesKey: 'cbrcat_tribes_list',
             defaultAvatar: 'https://i.ibb.co/V09zmWcT/image.png'
         };
 
@@ -23,55 +19,37 @@
         }
 
         function initCBRSystem() {
-            try {
-                let userData = localStorage.getItem(CONFIG.storageKey);
-                let idCounter = localStorage.getItem(CONFIG.counterKey);
-                // Загружаем список племен или создаем дефолтных Одиночек
-                let existingTribes = JSON.parse(localStorage.getItem(CONFIG.tribesKey)) || [
-                    { name: "Одиночки", smell: "Запах пыли", smellIcon: "", spawnCoords: "0,0" }
-                ];
+            let userData = localStorage.getItem(CONFIG.storageKey);
+            let idCounter = localStorage.getItem(CONFIG.counterKey);
 
-                if (idCounter === null) {
-                    localStorage.setItem(CONFIG.counterKey, "0");
-                    idCounter = "0";
-                }
+            if (idCounter === null) {
+                localStorage.setItem(CONFIG.counterKey, "0");
+                idCounter = "0";
+            }
 
-                if (!userData) {
-                    let currentCount = parseInt(idCounter);
-                    // Разработчик всегда получает 00.00
-                    let newID = currentCount === 0 ? "00.00" : formatPlayerID(currentCount);
-                    let startTribe = existingTribes[0];
-
-                    const newProfile = {
-                        id: newID,
-                        name: currentCount === 0 ? "Разработчик" : "Новый Кот",
-                        email: "",
-                        password: "",
-                        appearance: CONFIG.defaultAvatar,
-                        tribe: startTribe.name, //
-                        smell: startTribe.smell, //
-                        smellIcon: startTribe.smellIcon, //
-                        spawnPoint: startTribe.spawnCoords, //
-                        gender: "кот", //
-                        birthday: new Date().toLocaleDateString(),
-                        about: "История выживания...",
-                        status: currentCount === 0 ? "admin" : "player"
-                    };
-
-                    localStorage.setItem(CONFIG.storageKey, JSON.stringify(newProfile));
-                    localStorage.setItem(CONFIG.counterKey, (currentCount + 1).toString());
-                }
-            } catch (e) { console.error(e); }
+            if (!userData && idCounter === "0") {
+                const adminProfile = {
+                    id: "00.00",
+                    name: "Разработчик",
+                    gender: "кот",
+                    tribe: "Одиночки",
+                    appearance: CONFIG.defaultAvatar,
+                    birthday: new Date().toLocaleDateString(),
+                    about: "История выживания...",
+                    status: "admin"
+                };
+                localStorage.setItem(CONFIG.storageKey, JSON.stringify(adminProfile));
+                localStorage.setItem(CONFIG.counterKey, "1");
+            }
         }
 
-        // Парсер BB-кодов для отображения
-        function parseBBCode(text) {
-            if (!text) return "";
-            return text
-                .replace(/\[b\](.*?)\[\/b\]/gi, '<b>$1</b>')
-                .replace(/\[i\](.*?)\[\/i\]/gi, '<i>$1</i>')
-                .replace(/\[url\](.*?)\[\/url\]/gi, '<a href="$1" target="_blank">$1</a>')
-                .replace(/\[img\](.*?)\[\/img\]/gi, '<img src="$1" style="max-width:100%;">');
+        function adminDeletePlayerByID(targetID) {
+            if (targetID === "00.00") return alert("Нельзя удалить создателя!");
+            if (confirm("Вы точно хотите удалить игрока " + targetID + "?")) {
+                localStorage.removeItem(CONFIG.storageKey);
+                alert("Данные игрока удалены.");
+                location.reload();
+            }
         }
 
         initCBRSystem();
