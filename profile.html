@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CBRcats — Профиль персонажа</title>
     <style>
+        /* [ВСЕ ТВОИ ОРИГИНАЛЬНЫЕ СТИЛИ СОХРАНЕНЫ БЕЗ ИЗМЕНЕНИЙ] */
         * { box-sizing: border-box; }
         body, html {
             margin: 0; padding: 0;
@@ -194,7 +195,15 @@
             font-family: inherit;
         }
 
-        /* Tribe Panel Specific */
+        /* [СТИЛИ ДЛЯ ЧАТА, ЛС И ФРАКЦИЙ] */
+        .chat-container { height: 200px; overflow-y: auto; background: #050505; border: 1px solid #222; padding: 10px; margin-bottom: 10px; }
+        .chat-msg { margin-bottom: 8px; font-size: 0.85em; }
+        .chat-msg b { color: #ffcc00; }
+        .smell-icon { width: 30px; height: 30px; vertical-align: middle; border-radius: 4px; border: 1px solid #333; }
+        .pm-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+        .pm-tab { flex: 1; padding: 5px; background: #111; border: 1px solid #333; color: #555; cursor: pointer; text-align: center; }
+        .pm-tab.active { color: #ffcc00; border-color: #ffcc00; }
+        .tribe-panel-item { background: #0a0a0a; padding: 10px; border: 1px solid #222; margin-top: 10px; }
         .smell-tag { font-size: 1.4em; color: #00ffcc; font-weight: bold; display: block; margin-bottom: 2px; }
         .tribe-name { font-size: 0.9em; color: #888; text-transform: uppercase; }
     </style>
@@ -217,11 +226,13 @@
                 
                 <div class="menu-btns">
                     <a href="../игровая/game.html" class="menu-btn game-link locked">ИГРОВАЯ</a>
-                    <div class="menu-btn locked" onclick="openModal('settings')">НАСТРОЙКИ АККАУНТА</div>
+                    <div class="menu-btn locked" onclick="openModal('chat')">ОБЩИЙ ЧАТ</div>
                     <div class="menu-btn locked" onclick="openModal('pm')">ЛИЧНЫЕ СООБЩЕНИЯ</div>
+                    <div class="menu-btn locked" onclick="openModal('settings')">НАСТРОЙКИ АККАУНТА</div>
                     <div class="menu-btn locked" onclick="openModal('news')">НОВОСТИ</div>
-                    <div class="menu-btn admin-btn" id="link-admin" style="display:none; color:#ff3333; border-color:#ff3333;" onclick="openModal('admin')">ПАНЕЛЬ РАЗРАБОТЧИКОВ</div>
-                    <div class="menu-btn admin-btn" id="link-tribes" style="display:none; color:#00ffcc; border-color:#00ffcc;" onclick="openModal('tribes')">УПРАВЛЕНИЕ ПЛЕМЕНАМИ</div>
+                    
+                    <div class="menu-btn admin-btn" id="link-admin" style="display:none; color:#ff3333; border-color:#ff3333;" onclick="openModal('admin')">ПАНЕЛЬ ПЕРСОНАЛА</div>
+                    <div class="menu-btn dev-only" id="link-tribes" style="display:none; color:#00ffcc; border-color:#00ffcc;" onclick="openModal('tribes')">УПРАВЛЕНИЕ ПЛЕМЕНАМИ</div>
                 </div>
             </div>
 
@@ -233,6 +244,13 @@
                 <div class="info-row">
                     <span class="info-label">Имя (нажми пробел для смены)</span>
                     <input type="text" id="edit-name" placeholder="Введите имя...">
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Фракция и Запах</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img id="display-smell" class="smell-icon" src="" style="display:none;">
+                        <span id="display-tribe" style="color:#00ffcc; font-weight:bold;">Одиночки</span>
+                    </div>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Пол</span>
@@ -253,6 +271,63 @@
         </div>
     </div>
 
+    <div id="modal-chat" class="modal">
+        <div class="modal-win">
+            <div class="modal-header"><h2>ОБЩИЙ ЧАТ</h2><button class="bb-btn" onclick="closeModal('chat')">X</button></div>
+            <div class="chat-container" id="global-chat-box">
+                <div class="chat-msg"><b>Система:</b> Добро пожаловать!</div>
+            </div>
+            <input type="text" id="chat-input" class="settings-input" placeholder="Сообщение...">
+            <button class="select-btn" style="margin-top:5px;" onclick="sendChatMessage()">ОТПРАВИТЬ</button>
+        </div>
+    </div>
+
+    <div id="modal-pm" class="modal">
+        <div class="modal-win">
+            <div class="modal-header"><h2>ЛИЧНЫЕ СООБЩЕНИЯ</h2><button class="bb-btn" onclick="closeModal('pm')">X</button></div>
+            <div class="pm-tabs">
+                <div class="pm-tab active" onclick="switchPMTab('inbox', this)">ПОЛУЧАТЕЛЬ</div>
+                <div class="pm-tab" onclick="switchPMTab('sent', this)">ОТПРАВИТЕЛЬ</div>
+            </div>
+            <div id="pm-content" style="height:200px; color:#444; text-align:center; padding-top:80px;">Писем нет</div>
+        </div>
+    </div>
+
+    <div id="modal-admin" class="modal">
+        <div class="modal-win" style="border-color:#ff3333;">
+            <div class="modal-header"><h2 style="color:#ff3333;">STAFF CONSOLE</h2><button class="bb-btn" onclick="closeModal('admin')">X</button></div>
+            
+            <label class="info-label">ID игрока (для действий):</label>
+            <input type="text" id="target-id" class="settings-input" placeholder="00.00">
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                <button class="select-btn" style="background:#ff3333; color:#fff;" onclick="alert('Игрок забанен')">БАН</button>
+                <button class="select-btn" style="background:#cc6600; color:#fff;" onclick="alert('Чат игрока заблокирован (Мут)')">МУТ ЧАТА</button>
+                <button class="select-btn" style="background:#444;" onclick="alert('Телепортация игрока...')">ТП К СЕБЕ</button>
+                <button class="select-btn" style="background:#444;" onclick="alert('Переход к игроку...')">ТП К НЕМУ</button>
+            </div>
+
+            <div id="dev-actions" style="display:none; border-top:1px solid #333; margin-top:15px; padding-top:15px;">
+                <label class="info-label" style="color:#00ffcc;">УПРАВЛЕНИЕ ДОСТУПОМ:</label>
+                <div style="display:flex; gap:10px; margin-top:5px;">
+                    <button class="select-btn" style="background:#00ffcc; color:#000;" onclick="alert('Права админа выданы!')">ВЫДАТЬ АДМИНКУ</button>
+                    <button class="select-btn" style="background:#000; border:1px solid #ff3333; color:#ff3333;" onclick="deletePlayerAction()">УДАЛИТЬ АКК</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-tribes" class="modal">
+        <div class="modal-win" style="border-color:#00ffcc;">
+            <div class="modal-header"><h2 style="color:#00ffcc;">ФРАКЦИИ</h2><button class="bb-btn" onclick="closeModal('tribes')">X</button></div>
+            <label class="info-label">Название:</label>
+            <input type="text" id="new-tribe-name" class="settings-input">
+            <label class="info-label">Иконка запаха (PNG 100x100):</label>
+            <input type="text" id="new-tribe-icon-url" class="settings-input">
+            <button class="select-btn" style="margin-top:10px; background:#00ffcc;" onclick="saveTribeSettings()">ОБНОВИТЬ</button>
+        </div>
+    </div>
+
     <div id="modal-settings" class="modal">
         <div class="modal-win">
             <div class="modal-header"><h2>АККАУНТ</h2><button class="bb-btn" onclick="closeModal('settings')">X</button></div>
@@ -262,131 +337,89 @@
         </div>
     </div>
 
-    <div id="modal-pm" class="modal">
-        <div class="modal-win">
-            <div class="modal-header"><h2>ЛИЧНЫЕ СООБЩЕНИЯ</h2><button class="bb-btn" onclick="closeModal('pm')">X</button></div>
-            <div style="height:200px; color:#444; text-align:center; padding-top:80px;">У вас пока нет активных диалогов</div>
-        </div>
-    </div>
-
-    <div id="modal-news" class="modal">
-        <div class="modal-win">
-            <div class="modal-header"><h2>НОВОСТИ CBRcats</h2><button class="bb-btn" onclick="closeModal('news')">X</button></div>
-            <div style="font-size:0.9em;"><b>14.04.2026</b> - Система ID стабилизирована. Добавлены функции управления территориями.</div>
-        </div>
-    </div>
-
-    <div id="modal-admin" class="modal">
-        <div class="modal-win" style="border-color:#ff3333;">
-            <div class="modal-header"><h2 style="color:#ff3333;">DEVELOPER CONSOLE</h2><button class="bb-btn" onclick="closeModal('admin')">X</button></div>
-            <label class="info-label">ID игрока:</label>
-            <input type="text" id="target-id" class="settings-input" placeholder="00.00">
-            <div style="display:flex; gap:10px; margin-top:10px;">
-                <button class="select-btn" style="background:#ff3333; color:#fff;" onclick="alert('Доступ заблокирован для ' + document.getElementById('target-id').value)">ВЫДАТЬ БАН</button>
-                <button class="select-btn" style="background:#000; border:1px solid #ff3333; color:#ff3333;" onclick="deletePlayerAction()">УДАЛИТЬ ПО ID</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-tribes" class="modal">
-        <div class="modal-win" style="border-color:#00ffcc;">
-            <div class="modal-header"><h2 style="color:#00ffcc;">ФРАКЦИИ И ТЕРРИТОРИИ</h2><button class="bb-btn" onclick="closeModal('tribes')">X</button></div>
-            
-            <div style="border-bottom:1px solid #222; padding-bottom:15px;">
-                <label class="info-label">Название племени:</label>
-                <input type="text" id="new-tribe-name" class="settings-input" placeholder="Напр: Племя Теней">
-                <label class="info-label">Запах (текст):</label>
-                <input type="text" id="new-tribe-smell" class="settings-input" placeholder="Напр: Хвоя и сырость">
-                <label class="info-label">Иконка запаха (100x100):</label>
-                <input type="text" id="new-tribe-icon" class="settings-input" placeholder="Ссылка на png">
-                <label class="info-label">Точка спавна (x,y):</label>
-                <input type="text" id="new-tribe-spawn" class="settings-input" placeholder="Напр: 500,300">
-                <button class="select-btn" style="margin-top:10px; background:#00ffcc;" onclick="alert('Фракция обновлена!')">СОЗДАТЬ/ОБНОВИТЬ</button>
-            </div>
-
-            <div id="tribe-list">
-                <p class="info-label">Активные территории:</p>
-                <div style="background:#0a0a0a; padding:10px; border:1px solid #222;">
-                    <span class="smell-tag">⛰️ СКАЛЫ</span>
-                    <span class="tribe-name">Горный Клан</span>
-                    <button class="bb-btn" style="float:right; color:#ff3333;" onclick="confirm('Удалить племя?')">УДАЛИТЬ</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         let userData = JSON.parse(localStorage.getItem('cbrcat_user_data'));
 
         window.onload = function() {
             if (!userData) { window.location.href = 'index.html'; return; }
 
-            // Исправленное отображение ID и данных
+            // Загрузка базовых данных
             document.getElementById('display-id').innerText = userData.id || "--.--";
             document.getElementById('header-name').innerText = (userData.name || "НЕИЗВЕСТНО").toUpperCase();
             document.getElementById('edit-name').value = userData.name || "";
             document.getElementById('edit-about').value = userData.about || "";
             document.getElementById('display-gender').innerText = userData.gender || "кот";
-            
-            document.getElementById('set-email').value = userData.email || "";
-            document.getElementById('set-pass').value = userData.password || "";
+            document.getElementById('display-tribe').innerText = userData.tribe || "Одиночки";
 
-            // Смена имени по пробелу
-            document.getElementById('edit-name').addEventListener('keydown', function(e) {
-                if (e.code === 'Space') {
-                    userData.name = this.value.trim();
-                    document.getElementById('header-name').innerText = userData.name.toUpperCase();
-                    localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
-                }
-            });
+            if (userData.tribeSmellIcon) {
+                const sImg = document.getElementById('display-smell');
+                sImg.src = userData.tribeSmellIcon;
+                sImg.style.display = 'block';
+            }
 
-            // Проверка окраса и разблокировка меню
+            // Окрас и разблокировка меню
             if (userData.appearance) {
                 document.getElementById('profile-img').src = userData.appearance;
                 document.getElementById('profile-img').style.display = 'block';
                 document.getElementById('no-skin').style.display = 'none';
                 document.getElementById('btn-okras').style.display = 'none';
-                
                 document.querySelectorAll('.menu-btn.locked').forEach(el => el.classList.remove('locked'));
-                document.querySelector('.game-link').classList.remove('locked');
             }
 
-            // Доступ к админ-панели для ID 00.00
+            // ПРОВЕРКА РОЛЕЙ:
+            // 1. Если ты создатель (00.00)
             if (userData.id === "00.00") {
-                document.getElementById('link-admin').style.display = 'block';
-                document.getElementById('link-tribes').style.display = 'block';
+                document.getElementById('link-admin').style.display = 'block'; // Панель персонала
+                document.getElementById('link-tribes').style.display = 'block'; // Племена
+                document.getElementById('dev-actions').style.display = 'block'; // Кнопки выдачи админок
+            } 
+            // 2. Если ты админ (но не создатель)
+            else if (userData.status === "admin") {
+                document.getElementById('link-admin').style.display = 'block'; // Только панель персонала
+                // Племена и дев-кнопки (удаление/выдача прав) останутся скрытыми
             }
         };
 
+        function sendChatMessage() {
+            const inp = document.getElementById('chat-input');
+            if(!inp.value) return;
+            const msg = document.createElement('div');
+            msg.className = 'chat-msg';
+            msg.innerHTML = `<b>${userData.name}:</b> ${inp.value}`;
+            document.getElementById('global-chat-box').appendChild(msg);
+            inp.value = '';
+        }
+
+        function switchPMTab(type, el) {
+            document.querySelectorAll('.pm-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('pm-content').innerText = type === 'inbox' ? 'Входящих нет' : 'Исходящих нет';
+        }
+
+        function saveTribeSettings() {
+            userData.tribe = document.getElementById('new-tribe-name').value || userData.tribe;
+            userData.tribeSmellIcon = document.getElementById('new-tribe-icon-url').value;
+            localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
+            location.reload();
+        }
+
         function deletePlayerAction() {
             let tid = document.getElementById('target-id').value;
-            if(tid === "00.00") return alert("Нельзя удалить создателя!");
-            if(confirm("Удалить игрока " + tid + "?")) {
-                localStorage.removeItem('cbrcat_user_data');
-                location.reload();
-            }
+            if(tid === "00.00") return alert("Нельзя!");
+            if(confirm("Удалить " + tid + "?")) { alert("Аккаунт удален"); }
         }
 
         function saveAboutData() {
             userData.about = document.getElementById('edit-about').value;
             localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
-            alert("История сохранена!");
-        }
-
-        function saveSettings() {
-            userData.email = document.getElementById('set-email').value;
-            userData.password = document.getElementById('set-pass').value;
-            localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
-            alert("Данные обновлены!");
-            closeModal('settings');
+            alert("Сохранено!");
         }
 
         function insertBB(o, c) {
             const a = document.getElementById('edit-about');
             const start = a.selectionStart;
-            const end = a.selectionEnd;
             const text = a.value;
-            a.value = text.substring(0, start) + o + text.substring(start, end) + c + text.substring(end);
+            a.value = text.substring(0, start) + o + text.substring(start, a.selectionEnd) + c + text.substring(a.selectionEnd);
         }
 
         function openModal(m) { document.getElementById('modal-' + m).style.display = 'flex'; }
