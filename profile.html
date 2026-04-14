@@ -3,291 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CBRcats — Профиль персонажа</title>
+    <title>CBRcats — Личный кабинет</title>
     <style>
+        :root { --gold: #ffcc00; --red: #ff0000; --bg: #050505; }
         * { box-sizing: border-box; }
-        body, html {
-            margin: 0; padding: 0;
-            width: 100%; height: 100%;
-            background: #050505;
-            color: #d1d1d1;
-            font-family: 'Arial', sans-serif;
-            overflow: hidden;
+        body { 
+            margin: 0; background: var(--bg); color: #d1d1d1; 
+            font-family: 'Courier New', monospace; 
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
 
-        .profile-wrapper {
-            width: 95vw;
-            height: 90vh;
-            margin: 2vh auto;
-            background: #000;
-            border: 2px solid #ffcc00;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-shadow: 0 0 30px rgba(255, 204, 0, 0.1);
+        /* КАРТОЧКА ПРОФИЛЯ */
+        .profile-card {
+            width: 850px; background: #000; border: 2px solid var(--gold);
+            border-radius: 12px; padding: 25px; box-shadow: 0 0 30px rgba(255, 204, 0, 0.1);
+            display: flex; flex-direction: column; gap: 20px;
         }
 
-        .profile-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #222;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+        .header { 
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #222; padding-bottom: 15px;
         }
+        .header h1 { margin: 0; color: var(--gold); font-size: 1.5em; text-transform: uppercase; }
 
-        .profile-header h1 {
-            margin: 0;
-            color: #ffcc00;
-            font-size: 1.8em;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+        .main-layout { display: flex; gap: 30px; }
 
-        .exit-btn {
-            padding: 8px 20px;
-            background: transparent;
-            border: 1px solid #ff3333;
-            color: #ff3333;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: 0.3s;
-        }
-        .exit-btn:hover { background: #ff3333; color: #fff; }
-
-        .main-content {
-            display: flex;
-            flex: 1;
-            gap: 30px;
-            min-height: 0;
-        }
-
-        .left-col {
-            flex: 0 0 300px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
+        /* ЛЕВАЯ КОЛОНКА */
+        .left-side { flex: 0 0 260px; display: flex; flex-direction: column; gap: 10px; }
         .avatar-box {
-            width: 300px;
-            height: 350px;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 260px; height: 320px; background: #0a0a0a; border: 1px solid #333;
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
             position: relative;
-            overflow: hidden;
         }
+        .avatar-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .no-skin { font-size: 0.7em; color: #444; text-align: center; padding: 10px; }
 
-        #profile-img {
-            max-width: 100%;
-            max-height: 100%;
-            display: none;
-        }
-
-        .no-skin-text {
-            color: #222;
-            font-size: 0.8em;
-            text-align: center;
-        }
-
-        .select-btn {
-            width: 100%;
-            padding: 12px;
-            background: #4caf50;
-            color: #000;
-            border: none;
-            font-weight: bold;
+        .btn {
+            display: block; width: 100%; padding: 12px; background: #111;
+            color: var(--gold); border: 1px solid #333; text-align: center;
+            text-decoration: none; font-weight: bold; font-size: 0.8em; transition: 0.3s;
             cursor: pointer;
-            border-radius: 4px;
-            text-decoration: none;
-            text-align: center;
-            transition: 0.3s;
         }
-        .select-btn:hover { background: #66bb6a; }
+        .btn:hover:not(.locked) { background: #1a1a1a; border-color: var(--gold); }
+        .btn.locked { opacity: 0.2; cursor: not-allowed; filter: grayscale(1); }
+        .btn-okras { background: var(--gold); color: #000; border: none; }
 
-        .menu-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+        /* ПРАВАЯ КОЛОНКА */
+        .right-side { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+        .info-row { display: flex; justify-content: space-between; border-bottom: 1px solid #111; padding: 5px 0; }
+        .label { color: #666; font-size: 0.8em; text-transform: uppercase; }
+        .val { color: #eee; font-weight: bold; }
 
-        .menu-btn {
-            background: #111;
-            color: #888;
-            border: 1px solid #222;
-            padding: 10px;
-            text-align: center;
-            text-decoration: none;
-            font-size: 0.9em;
-            transition: 0.2s;
+        .editable-input {
+            background: transparent; border: 1px solid transparent; color: var(--gold);
+            font-family: inherit; font-size: 1em; width: 150px; text-align: right;
         }
-        
-        /* Стиль для заблокированных кнопок */
-        .menu-btn.locked {
-            opacity: 0.2;
-            cursor: not-allowed;
-            filter: grayscale(1);
+        .editable-input:hover { border-color: #333; }
+
+        .about-section { margin-top: 10px; }
+        .about-area {
+            width: 100%; height: 160px; background: #080808; border: 1px solid #222;
+            color: #bbb; padding: 10px; font-family: inherit; resize: none; margin-top: 5px;
         }
 
-        .menu-btn:not(.locked):hover {
-            border-color: #ffcc00;
-            color: #ffcc00;
+        /* ОКНО ЧАТА (MODAL) */
+        #chat-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center;
         }
-
-        .right-col {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
-            padding-right: 10px;
+        .chat-container {
+            width: 900px; height: 600px; background: #000; border: 1px solid var(--gold);
+            display: flex; position: relative;
         }
-
-        .info-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 15px;
-            background: #080808;
-            border-left: 3px solid #ffcc00;
-            border-radius: 4px;
-        }
-
-        .info-label { color: #666; font-size: 0.9em; }
-        .info-value { color: #eee; font-weight: bold; }
-
-        .about-box {
-            flex: 1;
-            background: #080808;
-            border: 1px solid #222;
-            padding: 15px;
-            border-radius: 4px;
-            margin-top: 10px;
-        }
-
-        .about-box h3 {
-            margin: 0 0 10px;
-            font-size: 0.8em;
-            color: #ffcc00;
-            text-transform: uppercase;
-        }
-
-        .about-text {
-            color: #888;
-            font-size: 0.95em;
-            line-height: 1.5;
-            font-style: italic;
-        }
+        .chat-sidebar { width: 200px; border-right: 1px solid #222; display: flex; flex-direction: column; }
+        .chat-tab { padding: 15px; cursor: pointer; border-bottom: 1px solid #111; font-size: 0.8em; color: #555; }
+        .chat-tab.active { color: var(--gold); background: #0a0a0a; }
+        .chat-main { flex: 1; display: flex; flex-direction: column; padding: 15px; }
+        .chat-msgs { flex: 1; background: #050505; border: 1px solid #222; overflow-y: auto; padding: 10px; margin-bottom: 10px; }
+        .msg-line { margin-bottom: 8px; font-size: 0.9em; border-bottom: 1px solid #0d0d0d; }
+        .msg-line b { color: var(--gold); }
     </style>
 </head>
 <body>
 
-    <div class="profile-wrapper">
-        <header class="profile-header">
-            <h1 id="header-name">ЗАГРУЗКА...</h1>
-            <button class="exit-btn" onclick="logout()">ВЫЙТИ</button>
-        </header>
+<div class="profile-card">
+    <div class="header">
+        <h1 id="top-name">ЗАГРУЗКА...</h1>
+        <button class="btn" style="width: auto; padding: 5px 15px; color: var(--red); border-color: var(--red);" onclick="saveAndExit()">ВЫХОД</button>
+    </div>
 
-        <div class="main-content">
-            <div class="left-col">
-                <div class="avatar-box" id="cat-box">
-                    <span class="no-skin-text" id="no-skin">ОКРАС НЕ ВЫБРАН</span>
-                    <img id="profile-img" src="" alt="Кот">
-                </div>
-                <a href="okras.html" class="select-btn">ВЫБРАТЬ ОКРАС</a>
-                
-                <div class="menu-btns">
-                    <a href="../игровая/game.html" class="menu-btn game-link">ИГРОВАЯ</a>
-                    <a href="#" class="menu-btn locked">ГРУППЫ / ЧАТЫ</a>
-                    <a href="#" class="menu-btn locked">ЛИЧНЫЕ СООБЩЕНИЯ</a>
-                    <a href="#" class="menu-btn locked">НОВОСТИ</a>
-                </div>
+    <div class="main-layout">
+        <div class="left-side">
+            <div class="avatar-box">
+                <img id="profile-img" src="" style="display:none;">
+                <div id="no-skin" class="no-skin">ОКРАС НЕ ВЫБРАН<br><small>Вы не можете войти в мир без внешности</small></div>
+            </div>
+            
+            <button id="btn-okras" class="btn btn-okras" onclick="location.href='okras.html'">ВЫБРАТЬ ОКРАС</button>
+            
+            <div id="menu-links">
+                <button class="btn locked" id="link-game" onclick="enterGame()">ИГРОВАЯ</button>
+                <button class="btn locked" id="link-chat" onclick="openChat('global')">ЧАТЫ</button>
+                <button class="btn locked" id="link-pm" onclick="openChat('pms')">ЛИЧНЫЕ СООБЩЕНИЯ</button>
+                <button class="btn locked" id="link-news">НОВОСТИ</button>
+            </div>
+        </div>
+
+        <div class="right-side">
+            <div class="info-row">
+                <span class="label">ID Персонажа</span>
+                <span class="val" id="display-id">#00.00</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Имя (изменяемо)</span>
+                <input type="text" id="edit-name" class="editable-input" value="...">
+            </div>
+            <div class="info-row">
+                <span class="label">Племя</span>
+                <span class="val" id="display-tribe">Одиночки</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Пол</span>
+                <span class="val" id="display-gender">...</span>
             </div>
 
-            <div class="right-col">
-                <div class="info-grid">
-                    <div class="info-row">
-                        <span class="info-label">ID Персонажа</span>
-                        <span class="info-value" id="display-id">--.--</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Имя</span>
-                        <span class="info-value" id="display-name">--</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Племя / Клан</span>
-                        <span class="info-value" id="display-tribe">--</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Пол</span>
-                        <span class="info-value" id="display-gender">--</span>
-                    </div>
-                </div>
-
-                <div class="about-box">
-                    <h3>О СЕБЕ</h3>
-                    <div class="about-text" id="display-about">
-                        Загрузка истории...
-                    </div>
+            <div class="about-section">
+                <span class="label">О себе (BB-коды / вставка ссылок)</span>
+                <textarea id="edit-about" class="about-area" placeholder="Напиши свою историю..."></textarea>
+                <div style="font-size: 0.6em; color: #444; margin-top: 5px;">
+                    [b]жирный[/b] [i]курсив[/i] [img]ссылка[/img] | CTRL+V для вставки картинки
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        window.onload = function() {
-            // Берем данные из единого хранилища, созданного в safelocal
-            const userData = JSON.parse(localStorage.getItem('cbrcat_user_data'));
-
-            if (!userData) {
-                // Если зашли в профиль без регистрации - выкидываем на главную
-                window.location.href = '../index.html';
-                return;
-            }
-
-            // 1. Заполняем текстовые поля
-            document.getElementById('header-name').textContent = userData.name.toUpperCase();
-            document.getElementById('display-id').textContent = userData.id;
-            document.getElementById('display-name').textContent = userData.name;
-            document.getElementById('display-tribe').textContent = userData.tribe;
-            document.getElementById('display-gender').textContent = userData.gender;
-            document.getElementById('display-about').textContent = userData.about;
-
-            // 2. Отображаем кота, если он выбран
-            const img = document.getElementById('profile-img');
-            const noSkin = document.getElementById('no-skin');
+<div id="chat-modal">
+    <div class="chat-container">
+        <div class="chat-sidebar">
+            <div class="chat-tab active" id="tab-global" onclick="switchTab('global')">ОБЩИЙ ЧАТ</div>
+            <div class="chat-tab" id="tab-groups" onclick="switchTab('groups')">ГРУППЫ/КАНАЛЫ</div>
+            <div class="chat-tab" id="tab-pms" onclick="switchTab('pms')">ЛИЧНЫЕ (ПО ID)</div>
+            <button class="btn" style="margin-top: auto; border: none; background: #111;" onclick="closeChat()">ЗАКРЫТЬ</button>
+        </div>
+        
+        <div class="chat-main">
+            <h3 id="chat-title" style="color: var(--gold); margin: 0 0 10px 0;">Общий канал</h3>
+            <div id="chat-window" class="chat-msgs"></div>
             
-            if (userData.appearance && userData.appearance !== "") {
-                img.src = userData.appearance;
-                img.style.display = 'block';
-                noSkin.style.display = 'none';
-            }
+            <div id="pm-target-box" style="display:none; margin-bottom: 5px;">
+                <input type="text" id="target-id" placeholder="Введите ID (00.01)" style="width: 150px; font-size: 0.8em;">
+            </div>
 
-            // 3. ПРОВЕРКА ГОТОВНОСТИ (isReady)
-            // Если окрас не выбран, блокируем вход в игровую
-            const gameLink = document.querySelector('.game-link');
-            if (!userData.isReady) {
-                gameLink.classList.add('locked');
-                gameLink.onclick = function(e) {
-                    e.preventDefault();
-                    alert("Сначала выберите окрас персонажа!");
-                };
-            }
-        };
+            <div style="display:flex; gap: 5px;">
+                <input type="text" id="chat-input" style="flex:1;" placeholder="Написать...">
+                <button class="btn" style="width: 100px; padding: 0;" onclick="sendMsg()">ОТПРАВИТЬ</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        function logout() {
-            // Просто уходим на главную (данные в localStorage остаются)
+<script>
+    let userData = JSON.parse(localStorage.getItem('cbrcat_user_data'));
+    let currentTab = 'global';
+
+    window.onload = function() {
+        if (!userData) {
+            alert("Нужна авторизация!");
             window.location.href = '../index.html';
+            return;
         }
-    </script>
+
+        // Заполнение данных
+        document.getElementById('top-name').innerText = userData.name.toUpperCase();
+        document.getElementById('display-id').innerText = "#" + userData.id;
+        document.getElementById('edit-name').value = userData.name;
+        document.getElementById('display-gender').innerText = userData.gender;
+        document.getElementById('display-tribe').innerText = userData.tribe;
+        document.getElementById('edit-about').value = userData.about || "";
+
+        // Проверка готовности (окраса)
+        if (userData.isReady) {
+            document.getElementById('btn-okras').style.display = 'none';
+            document.getElementById('profile-img').src = userData.appearance;
+            document.getElementById('profile-img').style.display = 'block';
+            document.getElementById('no-skin').style.display = 'none';
+            
+            // Активация кнопок
+            document.querySelectorAll('.btn.locked').forEach(el => el.classList.remove('locked'));
+        }
+
+        // Обработка вставки изображений (CTRL+V)
+        document.getElementById('edit-about').addEventListener('paste', function(e) {
+            const items = e.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf("image") !== -1) {
+                    alert("Изображение перехвачено! Вставьте прямую ссылку в тег [img]ссылка[/img]");
+                }
+            }
+        });
+    };
+
+    function enterGame() {
+        if (!userData.isReady) return alert("Сначала выбери окрас!");
+        window.location.href = '../игровая/game.html';
+    }
+
+    function saveAndExit() {
+        userData.name = document.getElementById('edit-name').value;
+        userData.about = document.getElementById('edit-about').value;
+        localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
+        window.location.href = '../index.html';
+    }
+
+    // ЛОГИКА ЧАТА
+    function openChat(tab) {
+        if (!userData.isReady) return alert("Доступно только после выбора окраса!");
+        document.getElementById('chat-modal').style.display = 'flex';
+        switchTab(tab);
+    }
+
+    function closeChat() {
+        document.getElementById('chat-modal').style.display = 'none';
+    }
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.chat-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        
+        document.getElementById('pm-target-box').style.display = (tab === 'pms') ? 'block' : 'none';
+        
+        const titles = {'global': 'Общий канал Племен', 'groups': 'Группы и Каналы', 'pms': 'Личные сообщения'};
+        document.getElementById('chat-title').innerText = titles[tab];
+        document.getElementById('chat-window').innerHTML = `<div class="msg-line" style="color:#444">Вы вошли в раздел: ${titles[tab]}</div>`;
+    }
+
+    function sendMsg() {
+        const input = document.getElementById('chat-input');
+        if (!input.value) return;
+
+        let prefix = `<b>[${userData.id}] ${userData.name}:</b> `;
+        if (currentTab === 'pms') {
+            const target = document.getElementById('target-id').value || "Себе";
+            prefix = `<span style="color:#666">[Личное для ${target}]</span> ` + prefix;
+        }
+
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'msg-line';
+        msgDiv.innerHTML = prefix + input.value;
+        
+        const win = document.getElementById('chat-window');
+        win.appendChild(msgDiv);
+        win.scrollTop = win.scrollHeight;
+        input.value = "";
+    }
+</script>
+
 </body>
 </html>
