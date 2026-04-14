@@ -3,8 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <title>CBRcats — Система Данных</title>
+    <style>
+        /* Добавил немного стилей для кнопки очистки */
+        .debug-panel {
+            margin: 20px;
+            padding: 15px;
+            border: 1px dashed #ff3333;
+            background: #1a0000;
+            color: #ff3333;
+            font-family: monospace;
+        }
+        .clear-btn {
+            background: #ff3333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+    <div class="debug-panel">
+        <h3>ПАНЕЛЬ УПРАВЛЕНИЯ БАЗОЙ</h3>
+        <p>Внимание: нажатие кнопки удалит ВСЕ аккаунты и сбросит счетчик ID.</p>
+        <button class="clear-btn" onclick="fullSystemReset()">ОЧИСТИТЬ ВСЕ АККАУНТЫ</button>
+    </div>
+
     <script>
         /**
          * CBRcats ENGINE v1.2 — Исправленная система ID и локаций
@@ -50,6 +75,18 @@
                 localStorage.setItem(CONFIG.storageKey, JSON.stringify(newProfile));
                 localStorage.setItem(CONFIG.counterKey, (currentCount + 1).toString());
                 console.log("CBRcats: Профиль инициализирован. ID: " + newID);
+            }
+        }
+
+        /**
+         * НОВАЯ ФУНКЦИЯ: Полный сброс системы
+         */
+        function fullSystemReset() {
+            if (confirm("ВЫ УВЕРЕНЫ? Все аккаунты будут безвозвратно удалены, а счетчик ID сбросится до 00.00.")) {
+                localStorage.removeItem(CONFIG.storageKey);
+                localStorage.removeItem(CONFIG.counterKey);
+                alert("База данных успешно очищена. Страница будет перезагружена.");
+                location.reload();
             }
         }
 
