@@ -6,6 +6,10 @@
 </head>
 <body>
     <script>
+        /**
+         * CBRcats ENGINE v1.2 — Исправленная система ID и локаций
+         */
+
         const CONFIG = {
             storageKey: 'cbrcat_user_data',
             counterKey: 'cbrcat_id_counter',
@@ -27,27 +31,40 @@
                 idCounter = "0";
             }
 
-            if (!userData && idCounter === "0") {
-                const adminProfile = {
-                    id: "00.00",
-                    name: "Разработчик",
-                    gender: "кот",
-                    tribe: "Одиночки",
+            if (!userData) {
+                let currentCount = parseInt(idCounter);
+                let newID = formatPlayerID(currentCount);
+                
+                const newProfile = {
+                    id: newID,
+                    name: currentCount === 0 ? "Разработчик" : "Новый Кот",
                     appearance: CONFIG.defaultAvatar,
+                    tribe: "Одиночки",
+                    gender: "кот",
+                    spawnLocID: "loc_main", // Спавн по ID локации
                     birthday: new Date().toLocaleDateString(),
                     about: "История выживания...",
-                    status: "admin"
+                    status: currentCount === 0 ? "admin" : "player"
                 };
-                localStorage.setItem(CONFIG.storageKey, JSON.stringify(adminProfile));
-                localStorage.setItem(CONFIG.counterKey, "1");
+
+                localStorage.setItem(CONFIG.storageKey, JSON.stringify(newProfile));
+                localStorage.setItem(CONFIG.counterKey, (currentCount + 1).toString());
+                console.log("CBRcats: Профиль инициализирован. ID: " + newID);
+            }
+        }
+
+        function updateCBRData(field, value) {
+            let data = JSON.parse(localStorage.getItem(CONFIG.storageKey));
+            if (data) {
+                data[field] = value;
+                localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
             }
         }
 
         function adminDeletePlayerByID(targetID) {
             if (targetID === "00.00") return alert("Нельзя удалить создателя!");
-            if (confirm("Вы точно хотите удалить игрока " + targetID + "?")) {
+            if (confirm("Удалить данные игрока " + targetID + "?")) {
                 localStorage.removeItem(CONFIG.storageKey);
-                alert("Данные игрока удалены.");
                 location.reload();
             }
         }
