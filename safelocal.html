@@ -2,81 +2,99 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>CBRcats Engine</title>
+    <title>CBRcats — Система Данных</title>
 </head>
 <body>
-<script>
-    /**
-     * ЦЕНТРАЛЬНЫЙ ДВИЖОК ДАННЫХ CBRcats
-     * Этот файл содержит логику регистрации, входа и генерации ID.
-     */
+    <script>
+        /**
+         * CBRcats ENGINE v1.1 — Оптимизированная система данных
+         */
 
-    const CBR_STORAGE_KEY = 'cbrcat_user_data';
-    const CBR_ID_COUNTER = 'cbrcat_id_counter';
-
-    // 1. Форматирование ID (из числа 100 делает "01.00")
-    function formatPlayerID(num) {
-        let main = Math.floor(num / 100).toString().padStart(2, '0');
-        let sub = (num % 100).toString().padStart(2, '0');
-        return `${main}.${sub}`;
-    }
-
-    // 2. РЕГИСТРАЦИЯ
-    window.registerUser = function(email, password) {
-        // Проверяем счетчик
-        let count = parseInt(localStorage.getItem(CBR_ID_COUNTER) || "0");
-        let newID = formatPlayerID(count);
-
-        const newProfile = {
-            id: newID,
-            email: email,
-            password: password,
-            name: count === 0 ? "Разработчик" : "Частокол",
-            appearance: "",    // Пусто, пока не выбран окрас
-            isReady: false,    // Блокировка игры до выбора окраса
-            tribe: "Одиночки",
-            gender: "кот",
-            birthday: new Date().toLocaleDateString()
+        const CONFIG = {
+            storageKey: 'cbrcat_user_data',
+            counterKey: 'cbrcat_id_counter',
+            defaultAvatar: 'https://i.ibb.co/V09zmWcT/image.png'
         };
 
-        // Сохраняем пользователя
-        localStorage.setItem(CBR_STORAGE_KEY, JSON.stringify(newProfile));
-        
-        // Увеличиваем глобальный счетчик для следующего
-        localStorage.setItem(CBR_ID_COUNTER, (count + 1).toString());
-
-        return true;
-    };
-
-    // 3. ВХОД
-    window.loginUser = function(email, password) {
-        const data = JSON.parse(localStorage.getItem(CBR_STORAGE_KEY));
-        if (data && data.email === email && data.password === password) {
-            return true;
+        /**
+         * Преобразует число в формат 00.00
+         */
+        function formatPlayerID(num) {
+            let main = Math.floor(num / 100).toString().padStart(2, '0');
+            let sub = (num % 100).toString().padStart(2, '0');
+            return `${main}.${sub}`;
         }
-        return false;
-    };
 
-    // 4. ОБНОВЛЕНИЕ ДАННЫХ (например, установка окраса)
-    window.updateCharacter = function(updates) {
-        let data = JSON.parse(localStorage.getItem(CBR_STORAGE_KEY));
-        if (data) {
-            data = { ...data, ...updates };
-            localStorage.setItem(CBR_STORAGE_KEY, JSON.stringify(data));
+        /**
+         * Инициализация данных (Регистрация и проверка ID)
+         */
+        function initCBRSystem() {
+            try {
+                let userData = localStorage.getItem(CONFIG.storageKey);
+                let idCounter = localStorage.getItem(CONFIG.counterKey);
+
+                if (idCounter === null) {
+                    localStorage.setItem(CONFIG.counterKey, "0");
+                    idCounter = "0";
+                }
+
+                if (!userData) {
+                    let currentCount = parseInt(idCounter);
+                    let newID = formatPlayerID(currentCount);
+                    
+                    const newProfile = {
+                        id: newID,
+                        name: currentCount === 0 ? "Разработчик" : "Новый Кот",
+                        email: "",        // Добавлено: Почта
+                        password: "",     // Добавлено: Пароль
+                        appearance: CONFIG.defaultAvatar,
+                        tribe: "Одиночки",
+                        gender: "кот",
+                        birthday: new Date().toLocaleDateString(),
+                        about: "История выживания...",
+                        status: currentCount === 0 ? "admin" : "player"
+                    };
+
+                    localStorage.setItem(CONFIG.storageKey, JSON.stringify(newProfile));
+                    localStorage.setItem(CONFIG.counterKey, (currentCount + 1).toString());
+                    console.log("CBRcats: Профиль создан! ID: " + newID);
+                }
+            } catch (e) {
+                console.error("Ошибка инициализации данных:", e);
+            }
         }
-    };
 
-    // 5. ПОЛУЧЕНИЕ ДАННЫХ
-    window.getCharacter = function() {
-        return JSON.parse(localStorage.getItem(CBR_STORAGE_KEY));
-    };
+        /**
+         * Универсальное обновление полей профиля
+         */
+        function updateCBRData(field, value) {
+            let data = JSON.parse(localStorage.getItem(CONFIG.storageKey));
+            if (data) {
+                data[field] = value;
+                localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
+            }
+        }
 
-    // Инициализация счетчика при первом запуске вообще
-    if (localStorage.getItem(CBR_ID_COUNTER) === null) {
-        localStorage.setItem(CBR_ID_COUNTER, "0");
-    }
+        /**
+         * Специальное обновление почты и пароля
+         */
+        function saveAccountSettings(newEmail, newPass) {
+            let data = JSON.parse(localStorage.getItem(CONFIG.storageKey));
+            if (data) {
+                data.email = newEmail;
+                data.password = newPass;
+                localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
+                return true;
+            }
+            return false;
+        }
 
-    console.log("CBRcats Engine: Система готова.");
-</script>
+        function getCBRData() {
+            return JSON.parse(localStorage.getItem(CONFIG.storageKey));
+        }
+
+        // Запуск при загрузке
+        initCBRSystem();
+    </script>
 </body>
 </html>
