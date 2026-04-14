@@ -89,6 +89,7 @@
             border-radius: 4px;
             text-align: center;
             text-decoration: none;
+            font-family: inherit;
         }
 
         .menu-btns { display: flex; flex-direction: column; gap: 8px; }
@@ -101,6 +102,7 @@
             text-align: center;
             cursor: pointer;
             font-size: 0.9em;
+            text-decoration: none;
         }
         
         .menu-btn.locked { opacity: 0.2; cursor: not-allowed; }
@@ -128,6 +130,7 @@
             font-weight: bold;
             font-family: inherit;
             outline: none;
+            width: 250px;
         }
 
         .about-section {
@@ -137,6 +140,16 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+        }
+
+        .toolbar { display: flex; gap: 5px; }
+        .bb-btn {
+            background: #151515;
+            border: 1px solid #333;
+            color: #777;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 0.7em;
         }
 
         .about-area {
@@ -156,7 +169,7 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -164,12 +177,13 @@
         .modal-win {
             background: #000;
             border: 2px solid #ffcc00;
-            width: 500px;
+            width: 600px;
             padding: 25px;
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 10px; }
         .settings-input {
             width: 100%;
             background: #111;
@@ -179,6 +193,10 @@
             margin-top: 5px;
             font-family: inherit;
         }
+
+        /* Tribe Panel Specific */
+        .smell-tag { font-size: 1.4em; color: #00ffcc; font-weight: bold; display: block; margin-bottom: 2px; }
+        .tribe-name { font-size: 0.9em; color: #888; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -200,8 +218,10 @@
                 <div class="menu-btns">
                     <a href="../игровая/game.html" class="menu-btn game-link locked">ИГРОВАЯ</a>
                     <div class="menu-btn locked" onclick="openModal('settings')">НАСТРОЙКИ АККАУНТА</div>
-                    <div class="menu-btn locked">ЧАТЫ</div>
-                    <div class="menu-btn admin-btn" id="link-admin" style="display:none; color:#00ffcc; border-color:#00ffcc;" onclick="alert('Панель админа')">АДМИН-ПАНЕЛЬ</div>
+                    <div class="menu-btn locked" onclick="openModal('pm')">ЛИЧНЫЕ СООБЩЕНИЯ</div>
+                    <div class="menu-btn locked" onclick="openModal('news')">НОВОСТИ</div>
+                    <div class="menu-btn admin-btn" id="link-admin" style="display:none; color:#ff3333; border-color:#ff3333;" onclick="openModal('admin')">ПАНЕЛЬ РАЗРАБОТЧИКОВ</div>
+                    <div class="menu-btn admin-btn" id="link-tribes" style="display:none; color:#00ffcc; border-color:#00ffcc;" onclick="openModal('tribes')">УПРАВЛЕНИЕ ПЛЕМЕНАМИ</div>
                 </div>
             </div>
 
@@ -211,13 +231,18 @@
                     <span id="display-id" style="color:#ffcc00; font-weight:bold;">--.--</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Имя (изменяемо)</span>
-                    <input type="text" id="edit-name">
+                    <span class="info-label">Имя (нажми пробел для смены)</span>
+                    <input type="text" id="edit-name" placeholder="Введите имя...">
                 </div>
 
                 <div class="about-section">
-                    <span class="info-label">О себе:</span>
-                    <textarea id="edit-about" class="about-area"></textarea>
+                    <div class="toolbar">
+                        <button class="bb-btn" onclick="insertBB('[b]', '[/b]')">[B]</button>
+                        <button class="bb-btn" onclick="insertBB('[i]', '[/i]')">[I]</button>
+                        <button class="bb-btn" onclick="insertBB('[url]', '[/url]')">[URL]</button>
+                        <button class="bb-btn" onclick="insertBB('[img]', '[/img]')">[IMG]</button>
+                    </div>
+                    <textarea id="edit-about" class="about-area" placeholder="Ваша история..."></textarea>
                     <button class="select-btn" style="background:transparent; border:1px solid #4caf50; color:#4caf50;" onclick="saveAboutData()">СОХРАНИТЬ ПРОФИЛЬ</button>
                 </div>
             </div>
@@ -226,21 +251,55 @@
 
     <div id="modal-settings" class="modal">
         <div class="modal-win">
-            <h2 style="color:#ffcc00; margin:0; font-size:1.2em;">НАСТРОЙКИ</h2>
+            <div class="modal-header"><h2>АККАУНТ</h2><button class="bb-btn" onclick="closeModal('settings')">X</button></div>
+            <label class="info-label">Почта:</label><input type="email" id="set-email" class="settings-input">
+            <label class="info-label">Пароль:</label><input type="password" id="set-pass" class="settings-input">
+            <button class="select-btn" onclick="saveSettings()">СОХРАНИТЬ</button>
+        </div>
+    </div>
+
+    <div id="modal-pm" class="modal">
+        <div class="modal-win">
+            <div class="modal-header"><h2>ЛИЧНЫЕ СООБЩЕНИЯ</h2><button class="bb-btn" onclick="closeModal('pm')">X</button></div>
+            <div style="height:200px; color:#444; text-align:center; padding-top:80px;">У вас пока нет активных диалогов</div>
+        </div>
+    </div>
+
+    <div id="modal-news" class="modal">
+        <div class="modal-win">
+            <div class="modal-header"><h2>НОВОСТИ CBRcats</h2><button class="bb-btn" onclick="closeModal('news')">X</button></div>
+            <div style="font-size:0.9em;"><b>14.04.2026</b> - Система ID стабилизирована. Добавлены функции управления территориями.</div>
+        </div>
+    </div>
+
+    <div id="modal-admin" class="modal">
+        <div class="modal-win" style="border-color:#ff3333;">
+            <div class="modal-header"><h2 style="color:#ff3333;">DEVELOPER CONSOLE</h2><button class="bb-btn" onclick="closeModal('admin')">X</button></div>
+            <label class="info-label">ID игрока для БАНА:</label>
+            <input type="text" id="target-id" class="settings-input" placeholder="00.00">
+            <button class="select-btn" style="background:#ff3333; color:#fff;" onclick="alert('Доступ заблокирован для ' + document.getElementById('target-id').value)">ВЫДАТЬ БАН</button>
+        </div>
+    </div>
+
+    <div id="modal-tribes" class="modal">
+        <div class="modal-win" style="border-color:#00ffcc;">
+            <div class="modal-header"><h2 style="color:#00ffcc;">ФРАКЦИИ И ТЕРРИТОРИИ</h2><button class="bb-btn" onclick="closeModal('tribes')">X</button></div>
             
-            <div>
-                <label class="info-label">Новая почта:</label>
-                <input type="email" id="set-email" class="settings-input" placeholder="example@mail.com">
+            <div style="border-bottom:1px solid #222; padding-bottom:15px;">
+                <label class="info-label">Название племени:</label>
+                <input type="text" id="new-tribe-name" class="settings-input" placeholder="Напр: Племя Теней">
+                <label class="info-label">Запах (изображение/текст):</label>
+                <input type="text" id="new-tribe-smell" class="settings-input" placeholder="Напр: Хвоя и сырость">
+                <button class="select-btn" style="margin-top:10px; background:#00ffcc;" onclick="alert('Племя создано!')">СОЗДАТЬ/ОБНОВИТЬ</button>
             </div>
 
-            <div>
-                <label class="info-label">Новый пароль:</label>
-                <input type="password" id="set-pass" class="settings-input" placeholder="********">
-            </div>
-
-            <div style="display:flex; gap:10px; margin-top:10px;">
-                <button class="select-btn" onclick="saveSettings()">СОХРАНИТЬ</button>
-                <button class="select-btn" style="background:#222; color:#fff;" onclick="closeModal('settings')">ЗАКРЫТЬ</button>
+            <div id="tribe-list">
+                <p class="info-label">Активные территории:</p>
+                <div style="background:#0a0a0a; padding:10px; border:1px solid #222;">
+                    <span class="smell-tag">⛰️ СКАЛЫ</span>
+                    <span class="tribe-name">Горный Клан</span>
+                    <button class="bb-btn" style="float:right; color:#ff3333;" onclick="confirm('Удалить племя и присоединить земли?')">УДАЛИТЬ</button>
+                </div>
             </div>
         </div>
     </div>
@@ -266,36 +325,55 @@
             document.getElementById('edit-name').value = userData.name;
             document.getElementById('edit-about').value = userData.about || "";
             
-            // Настройки
+            // Загрузка скрытых полей
             document.getElementById('set-email').value = userData.email || "";
             document.getElementById('set-pass').value = userData.password || "";
+
+            // Слушатель на изменение имени (срабатывает только при нажатии на пробел)
+            document.getElementById('edit-name').addEventListener('keydown', function(e) {
+                if (e.code === 'Space') {
+                    userData.name = this.value.trim();
+                    document.getElementById('header-name').innerText = userData.name.toUpperCase();
+                }
+            });
 
             if (userData.appearance) {
                 document.getElementById('profile-img').src = userData.appearance;
                 document.getElementById('profile-img').style.display = 'block';
                 document.getElementById('no-skin').style.display = 'none';
                 document.getElementById('btn-okras').style.display = 'none';
+                
                 document.querySelectorAll('.menu-btn.locked').forEach(el => el.classList.remove('locked'));
                 document.querySelector('.game-link').classList.remove('locked');
             }
 
-            if (fixedID === "00.00") document.getElementById('link-admin').style.display = 'block';
+            // Доступ только для разрабов (00.00)
+            if (fixedID === "00.00") {
+                document.getElementById('link-admin').style.display = 'block';
+                document.getElementById('link-tribes').style.display = 'block';
+            }
         };
 
         function saveAboutData() {
-            userData.name = document.getElementById('edit-name').value;
             userData.about = document.getElementById('edit-about').value;
             localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
-            document.getElementById('header-name').innerText = userData.name.toUpperCase();
-            alert("Профиль сохранен!");
+            alert("История сохранена!");
         }
 
         function saveSettings() {
             userData.email = document.getElementById('set-email').value;
             userData.password = document.getElementById('set-pass').value;
             localStorage.setItem('cbrcat_user_data', JSON.stringify(userData));
-            alert("Данные аккаунта обновлены!");
+            alert("Данные обновлены!");
             closeModal('settings');
+        }
+
+        function insertBB(o, c) {
+            const a = document.getElementById('edit-about');
+            const start = a.selectionStart;
+            const end = a.selectionEnd;
+            const text = a.value;
+            a.value = text.substring(0, start) + o + text.substring(start, end) + c + text.substring(end);
         }
 
         function openModal(m) { document.getElementById('modal-' + m).style.display = 'flex'; }
