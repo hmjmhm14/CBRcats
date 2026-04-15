@@ -135,6 +135,7 @@
         .menu-btn.locked {
             opacity: 0.2;
             cursor: not-allowed;
+            pointer-events: none; /* Чтобы нельзя было кликнуть на заблокированную */
         }
 
         .menu-btn:not(.locked):hover {
@@ -330,7 +331,7 @@
                 <a href="okras.html" id="btn-okras" class="select-btn">ВЫБРАТЬ ОКРАС</a>
 
                 <div class="menu-btns">
-                    <a href="../игровая/game.html" class="menu-btn game-link locked">ИГРОВАЯ</a>
+                    <a href="game.html" id="link-game" class="menu-btn locked">ИГРОВАЯ</a>
                     <div class="menu-btn locked" onclick="openModal('chat')">ОБЩИЙ ЧАТ</div>
                     <div class="menu-btn locked" onclick="openModal('pm')">ЛИЧНЫЕ СООБЩЕНИЯ</div>
                     <div class="menu-btn locked" onclick="openModal('settings')">НАСТРОЙКИ</div>
@@ -385,11 +386,8 @@
                 </select>
                 <button class="select-btn" style="margin-top:10px; padding:8px; font-size:0.7em;" onclick="initChat()">СОЗДАТЬ</button>
             </div>
-            
             <div id="my-chats-list" style="display:flex; flex-wrap:wrap; margin-bottom:5px;"></div>
-
             <div class="chat-container" id="global-chat-box"></div>
-            
             <div id="chat-owner-panel" style="display:none; border-top:1px solid #333; padding-top:10px;">
                 <div style="display:flex; gap:5px;">
                     <input type="text" id="chat-admin-target" class="settings-input" style="width:100px; margin:0" placeholder="ID игрока">
@@ -398,7 +396,6 @@
                     <button class="bb-btn" style="color:#ff3333" onclick="chatAdminAction('delete')">УДАЛИТЬ</button>
                 </div>
             </div>
-
             <div style="display:flex; gap:5px; margin-top:10px;">
                 <input type="text" id="chat-input" class="settings-input" style="margin:0" placeholder="Сообщение...">
                 <button class="bb-btn" onclick="sendChatMessage()">></button>
@@ -443,7 +440,6 @@
         };
 
         function refreshProfile() {
-            // ИСПРАВЛЕНИЕ: Скрываем пол, если это наш профиль
             const genderRow = document.getElementById('row-gender');
             if (userData.id) { 
                 genderRow.style.display = 'none'; 
@@ -459,12 +455,15 @@
             document.getElementById('set-email').value = userData.email || "";
             document.getElementById('edit-about').value = userData.about || "";
 
+            // ИСПРАВЛЕНИЕ: Разблокируем "ИГРОВУЮ", если есть окрас
             if (userData.appearance) {
                 const img = document.getElementById('profile-img');
                 img.src = userData.appearance;
                 img.style.display = 'block';
                 document.getElementById('no-skin').style.display = 'none';
                 document.getElementById('btn-okras').style.display = 'none';
+                
+                // Снимаем блокировку со всех кнопок меню
                 document.querySelectorAll('.menu-btn.locked').forEach(btn => btn.classList.remove('locked'));
             }
 
@@ -473,13 +472,10 @@
             }
         }
 
-        // --- ЛОГИКА ЧАТА ---
         function initChat() {
             const title = document.getElementById('new-chat-name').value;
             const mode = document.getElementById('new-chat-mode').value;
             if(!title) return alert("Введите название!");
-
-            // Добавляем тег чата в список
             const list = document.getElementById('my-chats-list');
             const tag = document.createElement('button');
             tag.className = 'chat-tag-btn';
@@ -490,7 +486,6 @@
                 document.getElementById('global-chat-box').innerHTML = `<div style="color:#ffcc00; text-align:center;">--- ВЫБРАН ЧАТ: ${title} ---</div>`;
             };
             list.appendChild(tag);
-
             activeChat = { title: title, type: mode, owner: userData.id, tribe: userData.tribe };
             document.getElementById('global-chat-box').innerHTML = `<div style="color:#00ffcc; text-align:center;">--- ЧАТ ${title} СОЗДАН ---</div>`;
             document.getElementById('chat-owner-panel').style.display = 'block';
@@ -519,10 +514,8 @@
             } else { alert("Игрок " + target + " исключен."); }
         }
 
-        // --- ЛОГИКА ЛС ---
         function openModal(m) { 
             document.getElementById('modal-' + m).style.display = 'flex'; 
-            // ИСПРАВЛЕНИЕ: Грузим ЛС сразу при открытии
             if(m === 'pm') {
                 loadPMs('inbox', document.querySelector('.pm-tab'));
             }
@@ -546,7 +539,6 @@
             document.getElementById('pm-body-text').value = "";
         }
 
-        // --- СОХРАНЕНИЕ ---
         function saveSettings() {
             userData.email = document.getElementById('set-email').value;
             userData.password = document.getElementById('set-pass').value;
@@ -570,11 +562,6 @@
 
         function closeModal(m) { document.getElementById('modal-' + m).style.display = 'none'; }
         function exitWithoutSave() { window.location.href = 'index.html'; }
-
-        /* Конец файла. 
-           Здесь могло быть еще 100 строк кода, 
-           но мы сохранили структуру твоего проекта. 
-        */
     </script>
 </body>
 </html>
