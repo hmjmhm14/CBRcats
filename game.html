@@ -2,133 +2,259 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CBRcats — Игровая</title>
-    
-    <script>
-        const userData = JSON.parse(localStorage.getItem('cbrcat_user_data'));
-        // Если нет данных или окрас не выбран — доступ закрыт
-        if (!userData || !userData.isReady) {
-            alert("Доступ запрещен! Сначала создайте персонажа в профиле.");
-            window.location.href = '../Профиль/profile.html';
-        }
-    </script>
-
     <style>
         * { box-sizing: border-box; }
-        body, html {
-            margin: 0; padding: 0;
-            width: 100%; height: 100%;
-            overflow: hidden;
-            background: #050505; color: #e0e0e0;
-            font-family: 'Arial', sans-serif;
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: #000; color: #eee; font-family: 'Courier New', Courier, monospace;
+            overflow: hidden; 
         }
 
-        .app-container {
-            display: flex;
-            width: 100vw; height: 100vh;
-            padding: 10px; gap: 10px;
+        .game-wrapper { display: flex; width: 100vw; height: 100vh; }
+
+        /* Боковые панели */
+        .side-panel { 
+            width: 250px; background: #050505; border: 1px solid #222; 
+            display: flex; flex-direction: column; padding: 15px; z-index: 10;
         }
 
-        .side-panel {
-            flex: 0 0 250px;
-            background: #000;
-            border: 2px solid #ffcc00;
-            border-radius: 10px;
-            padding: 15px;
-            display: flex; flex-direction: column;
+        /* Центр - Игровое поле */
+        .viewport { 
+            flex: 1; position: relative; background: #0a0a0a; 
+            overflow: auto; display: flex; justify-content: center; align-items: center;
+        }
+        #game-map { 
+            width: 1000px; height: 1000px; background: #111; 
+            background-image: linear-gradient(#1a1a1a 1px, transparent 1px), 
+                              linear-gradient(90deg, #1a1a1a 1px, transparent 1px);
+            background-size: 20px 20px; position: relative;
         }
 
-        /* Окно персонажа в игре */
-        .game-avatar-box {
-            width: 100%; height: 200px;
-            background: #0a0a0a; border: 1px solid #222;
-            margin-bottom: 15px; display: flex;
-            justify-content: center; align-items: center;
-        }
-        #game-cat-img { max-width: 100%; max-height: 100%; }
+        /* Параметры */
+        .stat-bar { width: 100%; height: 15px; background: #222; margin: 5px 0; border-radius: 3px; overflow: hidden; }
+        .stat-fill { height: 100%; transition: 0.3s; width: 100%; }
+        .label { font-size: 0.7em; text-transform: uppercase; color: #888; }
 
-        .game-viewport {
-            flex: 1;
-            background: #000;
-            border: 2px solid #333;
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden; /* Здесь будет карта 1000x1000 */
-        }
+        /* Чат слева */
+        .chat-area { flex: 1; display: flex; flex-direction: column; margin-top: 20px; }
+        #game-chat { flex: 1; background: #000; border: 1px solid #222; padding: 5px; overflow-y: auto; font-size: 0.8em; margin-bottom: 5px; }
+        .chat-input-group { display: flex; gap: 2px; }
+        .chat-input-group input { flex: 1; background: #111; border: 1px solid #333; color: #fff; padding: 5px; outline: none; }
+        .bb-btn { background: #222; border: 1px solid #444; color: #888; cursor: pointer; padding: 2px 5px; font-size: 0.7em; }
 
-        #game-canvas {
-            width: 1000px; height: 1000px;
-            background-image: 
-                linear-gradient(#111 1px, transparent 1px),
-                linear-gradient(90deg, #111 1px, transparent 1px);
-            background-size: 50px 50px;
-            position: absolute;
+        /* Кот */
+        #player-cat { 
+            position: absolute; width: 40px; height: 40px; 
+            transition: left 0.2s, top 0.2s; pointer-events: none;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #player-cat img { width: 100%; height: 100%; }
+
+        /* Админ-панель */
+        #admin-tool { 
+            margin-top: 20px; padding: 10px; border: 1px dashed #ff3333; display: none; 
         }
 
-        h3 { color: #ffcc00; font-size: 0.9em; text-transform: uppercase; margin: 10px 0; }
-
-        .bar { width: 100%; height: 10px; background: #222; border-radius: 5px; margin: 5px 0 15px; overflow: hidden; }
-        .progress { height: 100%; transition: 0.3s; }
-
-        .action-btn {
-            background: #111; color: #ccc; border: 1px solid #333;
-            padding: 10px; margin-bottom: 5px; cursor: pointer;
-            text-align: left; transition: 0.2s;
-        }
-        .action-btn:hover { border-color: #ffcc00; color: #ffcc00; }
+        /* Статусы здоровья */
+        .dead { opacity: 0.5; filter: grayscale(1); }
+        .void { opacity: 0.2; filter: invert(1); }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <aside class="side-panel">
-            <div class="game-avatar-box">
-                <img id="game-cat-img" src="" alt="Ваш персонаж">
-            </div>
+    <div class="game-wrapper">
+        <div class="side-panel">
+            <div class="label">Навыки</div>
+            <div style="font-size: 0.8em; color: #ffcc00;">Охота: 1 | Бой: 1</div>
             
-            <h3 id="game-cat-name">ЗАГРУЗКА...</h3>
-            <div style="font-size: 0.8em; color: #666; margin-bottom: 10px;">ID: <span id="game-cat-id">00.00</span></div>
-
-            <div class="stats">
-                Здоровье <div class="bar"><div class="progress" style="width: 100%; background: #f33;"></div></div>
-                Энергия <div class="bar"><div class="progress" style="width: 80%; background: #ffcc00;"></div></div>
-                Сытость <div class="bar"><div class="progress" style="width: 60%; background: #4caf50;"></div></div>
-            </div>
-        </aside>
-
-        <main class="game-viewport">
-            <div id="game-canvas">
+            <div class="chat-area">
+                <div class="label">Игровой чат</div>
+                <div id="game-chat"></div>
+                <div class="toolbar" style="margin-bottom: 2px;">
+                    <button class="bb-btn" onclick="addBB('[b]')">B</button>
+                    <button class="bb-btn" onclick="addBB('[i]')">I</button>
                 </div>
-        </main>
+                <div class="chat-input-group">
+                    <input type="text" id="chat-msg" placeholder="Сказать...">
+                    <button class="bb-btn" onclick="sendMessage()">></button>
+                </div>
+            </div>
+        </div>
 
-        <aside class="side-panel">
-            <h3>Действия</h3>
-            <button class="action-btn">Осмотреться</button>
-            <button class="action-btn">Искать еду</button>
-            <button class="action-btn">Подать голос</button>
-            
-            <button class="action-btn" onclick="location.href='../Профиль/profile.html'" style="margin-top: auto; color: #ff3333; border-color: #400;">ВЕРНУТЬСЯ В ПРОФИЛЬ</button>
-        </aside>
+        <div class="viewport">
+            <div id="game-map" onclick="handleMove(event)" ondblclick="handleRotate(event)">
+                <div id="player-cat">
+                    <img id="cat-sprite" src="" alt="Cat">
+                </div>
+            </div>
+        </div>
+
+        <div class="side-panel">
+            <div class="label">Состояние</div>
+            <div class="label">Голод</div>
+            <div class="stat-bar"><div id="bar-hunger" class="stat-fill" style="background: #ffaa00;"></div></div>
+            <div class="label">Жажда</div>
+            <div class="stat-bar"><div id="bar-thirst" class="stat-fill" style="background: #00aaff;"></div></div>
+            <div class="label">Чистота</div>
+            <div class="stat-bar"><div id="bar-clean" class="stat-fill" style="background: #ffffff;"></div></div>
+            <div class="label">Здоровье</div>
+            <div class="stat-bar"><div id="bar-health" class="stat-fill" style="background: #ff3333;"></div></div>
+            <div id="location-name" style="font-size: 0.7em; color: #555; text-align: center; margin-top: 5px;">Мир живых</div>
+
+            <div style="margin-top: 30px;">
+                <div class="label">Действия</div>
+                <button class="select-btn" onclick="actionLick()" style="width:100%; background:#222; border:1px solid #444; color:#fff; cursor:pointer; padding:10px;">ВЫЛИЗЫВАНИЕ</button>
+            </div>
+
+            <div id="admin-tool">
+                <div class="label" style="color: #ff3333;">Admin Control</div>
+                <input type="text" id="target-id" placeholder="ID игрока" class="bb-btn" style="width: 100%; margin-bottom: 5px;">
+                <input type="text" id="new-model" placeholder="URL модельки" class="bb-btn" style="width: 100%;">
+                <button class="bb-btn" style="width: 100%; margin-top: 5px;" onclick="adminChangeModel()">СМЕНИТЬ ВИД</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Загружаем данные персонажа в интерфейс игры
-        window.onload = function() {
-            const data = JSON.parse(localStorage.getItem('cbrcat_user_data'));
-            if (data) {
-                document.getElementById('game-cat-img').src = data.appearance;
-                document.getElementById('game-cat-name').textContent = data.name.toUpperCase();
-                document.getElementById('game-cat-id').textContent = data.id;
-            }
+        let userData = JSON.parse(localStorage.getItem('cbrcat_user_data')) || { id: "99.99", name: "Guest", tribe: "Одиночка" };
+        
+        // Параметры
+        let stats = {
+            hunger: 100, thirst: 100, clean: 100, health: 100, karma: 0
         };
 
-        // Базовая логика камеры (центрирование на персонаже)
-        const canvas = document.getElementById('game-canvas');
-        let posX = 500;
-        let posY = 500;
+        // Координаты
+        let catPos = { x: 500, y: 500, rotation: 0 };
 
-        // В будущем здесь будет код движения персонажа по сетке
+        window.onload = function() {
+            // Установка окраса
+            if(userData.appearance) {
+                document.getElementById('cat-sprite').src = userData.appearance;
+            }
+            
+            // Проверка админа
+            if(userData.id === "00.00") {
+                document.getElementById('admin-tool').style.display = 'block';
+            }
+
+            // Запуск циклов
+            setInterval(decayStats, 5000); // Для теста быстрее (раз в 5 сек)
+            updateBars();
+            refreshCat();
+        };
+
+        // ДВИЖЕНИЕ
+        function handleMove(e) {
+            if(stats.health <= 0 && stats.health > -100) return; // Мертвые ходят по своим правилам (здесь можно добавить переход)
+            
+            const rect = document.getElementById('game-map').getBoundingClientRect();
+            catPos.x = e.clientX - rect.left - 20;
+            catPos.y = e.clientY - rect.top - 20;
+            refreshCat();
+        }
+
+        function handleRotate(e) {
+            catPos.rotation += 90;
+            if(catPos.rotation >= 360) catPos.rotation = 0;
+            refreshCat();
+        }
+
+        function refreshCat() {
+            const cat = document.getElementById('player-cat');
+            cat.style.left = catPos.x + 'px';
+            cat.style.top = catPos.y + 'px';
+            cat.style.transform = `rotate(${catPos.rotation}deg)`;
+        }
+
+        // ПАРАМЕТРЫ
+        function decayStats() {
+            // Голод и жажда (имитация раз в день - здесь раз в цикл)
+            stats.hunger -= 2;
+            stats.thirst -= 3;
+            // Чистота (рандом -1 или -5)
+            stats.clean -= (Math.random() > 0.5 ? 1 : 5);
+
+            if(stats.hunger < 0) stats.hunger = 0;
+            if(stats.thirst < 0) stats.thirst = 0;
+            if(stats.clean < 0) stats.clean = 0;
+
+            // Если голод или жажда 0 - падает здоровье
+            if(stats.hunger <= 0 || stats.thirst <= 0) stats.health -= 5;
+
+            checkLifeStatus();
+            updateBars();
+        }
+
+        function checkLifeStatus() {
+            const sprite = document.getElementById('cat-sprite');
+            const loc = document.getElementById('location-name');
+
+            if(stats.health <= 0 && stats.health > -100) {
+                // СМЕРТЬ 1 (ЗП или СЛ)
+                sprite.className = 'dead';
+                loc.innerText = (stats.karma >= 0) ? "Звездное племя" : "Сумрачный лес";
+                if(stats.health === 0) logToChat("<i>Вы чувствуете холод... ваши лапы ведут вас в мир теней.</i>");
+            } else if (stats.health <= -100) {
+                // СМЕРТЬ 2 (Пустозведье)
+                sprite.className = 'void';
+                loc.innerText = "Пустозведье";
+                logToChat("<b style='color:red'>Вы стерты из памяти племен.</b>");
+            } else {
+                sprite.className = '';
+                loc.innerText = "Мир живых";
+            }
+        }
+
+        function updateBars() {
+            document.getElementById('bar-hunger').style.width = stats.hunger + '%';
+            document.getElementById('bar-thirst').style.width = stats.thirst + '%';
+            document.getElementById('bar-clean').style.width = stats.clean + '%';
+            document.getElementById('bar-health').style.width = Math.abs(stats.health) + '%';
+        }
+
+        // ДЕЙСТВИЯ
+        function actionLick() {
+            if(stats.health <= 0) return alert("Мертвые не могут умываться!");
+            stats.clean += 15;
+            if(stats.clean > 100) stats.clean = 100;
+            logToChat(`<b>${userData.name}</b> тщательно вылизывает свою шерстку.`);
+            updateBars();
+        }
+
+        // ЧАТ
+        function sendMessage() {
+            const inp = document.getElementById('chat-msg');
+            if(!inp.value) return;
+            let text = inp.value;
+            // Простейшая замена BB-кодов
+            text = text.replace(/\[b\](.*?)\[\/b\]/g, '<b>$1</b>');
+            text = text.replace(/\[i\](.*?)\[\/i\]/g, '<i>$1</i>');
+            
+            logToChat(`<b>${userData.name}:</b> ${text}`);
+            inp.value = '';
+        }
+
+        function logToChat(html) {
+            const chat = document.getElementById('game-chat');
+            chat.innerHTML += `<div>${html}</div>`;
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function addBB(code) {
+            document.getElementById('chat-msg').value += code;
+        }
+
+        // АДМИН
+        function adminChangeModel() {
+            const target = document.getElementById('target-id').value;
+            const modelUrl = document.getElementById('new-model').value;
+            // В мультиплеере тут был бы запрос к БД, сейчас меняем себе для теста
+            if(target === userData.id || target === "") {
+                document.getElementById('cat-sprite').src = modelUrl;
+                logToChat("<span style='color:red'>[СИСТЕМА] Модель изменена администратором.</span>");
+            }
+        }
     </script>
 </body>
 </html>
